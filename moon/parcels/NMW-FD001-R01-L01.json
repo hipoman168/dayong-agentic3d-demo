@@ -1,0 +1,40 @@
+{
+  "parcel_id": "NMW-FD001-R01-L01",
+  "status": "ACTIVE_POC",
+  "land_unit": "1 NLU",
+  "area_m2": 661,
+  "lunar_anchor": {
+    "region": "Mare Tranquillitatis",
+    "lat_deg": 0.67,
+    "lon_deg": 23.47,
+    "side": "near-side"
+  },
+  "address": {
+    "district": "Founding District 001",
+    "road_zh": "地球景觀大道",
+    "road_en": "Earth View Avenue",
+    "lot_no": "001"
+  },
+  "building": {
+    "building_id": "NMW-HOUSE-001",
+    "name": "Earth View House 001",
+    "state": "visual_poc",
+    "tour_url": "./"
+  },
+  "provenance": {
+    "terrain": "PENDING_REAL_DEM_BINDING",
+    "building": "MODEL_GENERATED",
+    "interior": "MODEL_GENERATED"
+  },
+  "patent_mapping": [
+    "Persistent Spatial Identity",
+    "Scoped Execution Authority",
+    "Generation Sandbox",
+    "Provenance-aware Spatial State",
+    "Composable Parcel Authority"
+  ],
+  "certificate": {
+    "certificate_id": "NMW-LPC-000001",
+    "status": "DRAFT"
+  }
+}
