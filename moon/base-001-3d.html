@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>New Moon World｜Earth View House 001 · 3D Freestyle</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#c{width:100%;height:100%;display:block}
+#hud{position:fixed;left:12px;top:12px;z-index:5;background:rgba(5,8,16,.72);backdrop-filter:blur(10px);padding:10px 12px;border:1px solid rgba(255,255,255,.16);border-radius:12px;max-width:330px}
+#hud b{font-size:15px} #hud small{display:block;color:#b8c1d9;margin-top:4px;line-height:1.4}
+#status{margin-top:7px;font-size:12px;color:#9ef7c2}
+#cross{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.5;pointer-events:none}
+#tour{position:fixed;left:10px;right:10px;bottom:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;z-index:7}
+#tour button,#actions button{min-height:46px;border:1px solid rgba(255,255,255,.22);background:rgba(7,10,16,.78);color:#fff;border-radius:10px;font-size:13px;padding:6px}
+#tour button:active,#actions button:active{background:#2b5b88}
+#actions{position:fixed;right:12px;bottom:68px;display:flex;gap:7px;z-index:7}
+#actions button{padding:0 14px;font-size:13px}
+@media(max-width:520px){#tour{grid-template-columns:repeat(3,1fr)}#actions{bottom:120px}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <b>New Moon World｜Earth View House 001 · 3D</b>
+  <small>真實 SLDEM2015 巨觀地形 + 可走動建築幾何。手機用一鍵導覽；桌面可用 WASD＋滑鼠自由探索。</small>
+  <div id="status">目前位置：Founding Parcel 001。SLDEM2015 terrain bound.</div>
+</div>
+<div id="cross">＋</div><a id="photoLink" href="./base-001.html" style="position:fixed;right:12px;top:12px;z-index:8;color:#ffe0a3;text-decoration:none;background:rgba(5,8,16,.76);border:1px solid rgba(232,194,122,.45);padding:9px 12px;border-radius:10px;font-size:12px">Photoreal Tour</a>
+<div id="tour">
+  <button data-view="gate">看城門</button>
+  <button data-view="house">看房子</button>
+  <button data-view="living">進客廳</button>
+  <button data-view="upper">上二樓</button>
+  <button data-view="earth">看地球</button>
+</div>
+<div id="actions"><button id="reset">回入口</button></div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.12;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x020307);
+scene.fog=new THREE.Fog(0x020307,180,620);
+
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,800);
+camera.position.set(0,2.1,58);
+
+const hemi=new THREE.HemisphereLight(0x91a5d0,0x121212,.52);scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xfff2d2,3.0);sun.position.set(-65,110,50);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-90;sun.shadow.camera.right=90;sun.shadow.camera.top=90;sun.shadow.camera.bottom=-90;scene.add(sun);
+
+const earthDir=new THREE.Vector3(.68,.30,-.67).normalize();
+const earthPos=earthDir.clone().multiplyScalar(260);
+const earthCanvas=document.createElement('canvas');earthCanvas.width=1024;earthCanvas.height=512;
+const ex=earthCanvas.getContext('2d');
+ex.fillStyle='#164b88';ex.fillRect(0,0,1024,512);
+ex.fillStyle='#5da35c';
+[[250,230,85,50],[350,175,75,60],[610,260,95,60],[690,180,55,40],[500,330,70,45]].forEach(p=>{ex.beginPath();ex.ellipse(...p,0,0,Math.PI*2);ex.fill()});
+ex.fillStyle='rgba(255,255,255,.65)';
+for(let i=0;i<22;i++){ex.beginPath();ex.ellipse((i*137)%1024,(i*79)%512,35+(i%4)*14,6+(i%3)*4,0,0,Math.PI*2);ex.fill()}
+const earthTex=new THREE.CanvasTexture(earthCanvas);
+const earth=new THREE.Mesh(new THREE.SphereGeometry(23,48,32),new THREE.MeshStandardMaterial({map:earthTex,roughness:.85,emissive:0x091425,emissiveIntensity:.4}));
+earth.position.copy(earthPos);scene.add(earth);
+
+const starGeo=new THREE.BufferGeometry();const stars=[];for(let i=0;i<1200;i++){const r=350+Math.random()*250,th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);stars.push(r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),r*Math.sin(ph)*Math.sin(th))}
+starGeo.setAttribute('position',new THREE.Float32BufferAttribute(stars,3));
+scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:.8,sizeAttenuation:false})));
+
+const DEM_GRID=[[-12.5,-7.5,-4.0,-2.5,-3.5,-8.0,-10.5,-11.0,-13.0],[-4.5,-4.5,-4.5,-3.5,-5.5,-11.5,-13.0,-11.5,-13.0],[1.5,-1.5,-5.5,-5.0,-6.0,-9.0,-9.5,-8.0,-10.0],[1.5,-2.5,-5.5,-5.0,-3.0,-4.5,-6.0,-5.5,-7.5],[0.0,-4.0,-6.0,-2.5,0.0,-2.5,-5.5,-5.0,-4.5],[0.0,-1.0,-3.0,-1.5,0.5,-3.0,-5.5,-4.5,-3.0],[4.0,6.0,4.5,1.0,-0.5,-2.0,-3.5,-3.5,-5.5],[8.5,10.5,9.5,3.0,0.0,0.0,-1.5,-2.5,-3.5],[7.0,8.5,6.5,1.0,-2.0,-2.0,-2.5,-2.0,-0.5]];
+const DEM_STEP=59.2252938;
+const DEM_SPAN=DEM_STEP*8;
+function lunarY(x,z){
+  const u=Math.max(0,Math.min(8,4+x/DEM_STEP));
+  const v=Math.max(0,Math.min(8,4-z/DEM_STEP));
+  const x0=Math.floor(u),z0=Math.floor(v),x1=Math.min(8,x0+1),z1=Math.min(8,z0+1);
+  const tx=u-x0,tz=v-z0;
+  const a=DEM_GRID[z0][x0]*(1-tx)+DEM_GRID[z0][x1]*tx;
+  const b=DEM_GRID[z1][x0]*(1-tx)+DEM_GRID[z1][x1]*tx;
+  return a*(1-tz)+b*tz;
+}
+const groundGeo=new THREE.PlaneGeometry(DEM_SPAN,DEM_SPAN,128,128);groundGeo.rotateX(-Math.PI/2);
+const pos=groundGeo.attributes.position;
+for(let i=0;i<pos.count;i++){
+  const x=pos.getX(i),z=pos.getZ(i);
+  const macro=lunarY(x,z);
+  const micro=.10*Math.sin(x*.17)+.07*Math.cos(z*.15);
+  pos.setY(i,macro+micro);
+}
+groundGeo.computeVertexNormals();
+const ground=new THREE.Mesh(groundGeo,new THREE.MeshStandardMaterial({color:0x45484d,roughness:1,metalness:0}));
+ground.receiveShadow=true;ground.userData={provenance:'SLDEM2015_MEASURED_PLUS_GENERATED_MICRO_OVERLAY'};scene.add(ground);
+
+// Generated microterrain overlay; scientific base remains immutable.
+const craterMat=new THREE.MeshStandardMaterial({color:0x626260,roughness:1});
+for(const [x,z,s] of [[-48,-42,7],[52,-48,10],[-58,34,6],[48,38,5]]){const ring=new THREE.Mesh(new THREE.TorusGeometry(s,1.4,10,48),craterMat);ring.rotation.x=Math.PI/2;ring.position.set(x,lunarY(x,z)+.25,z);scene.add(ring)}
+const rockMat=new THREE.MeshStandardMaterial({color:0x595957,roughness:1});
+for(let i=0;i<48;i++){const x=(Math.random()-.5)*155,z=(Math.random()-.5)*150;if(Math.abs(x)<18&&z>5&&z<58)continue;const s=.4+Math.random()*1.8;const r=new THREE.Mesh(new THREE.DodecahedronGeometry(s,0),rockMat);r.position.set(x,lunarY(x,z)+s*.65,z);r.rotation.set(Math.random(),Math.random(),Math.random());r.castShadow=true;scene.add(r)}
+
+const darkWood=new THREE.MeshStandardMaterial({color:0x2d211d,roughness:.8});
+const plaster=new THREE.MeshStandardMaterial({color:0xe3e1d9,roughness:.95});
+const tile=new THREE.MeshStandardMaterial({color:0x26282d,roughness:.8});
+function box(x,y,z,w,h,d,m,parent=scene){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+const gate=new THREE.Group();scene.add(gate);gate.position.set(0,lunarY(0,44),44);
+box(-5,3,0,3,6,3,plaster,gate);box(5,3,0,3,6,3,plaster,gate);box(0,6.1,0,13,1.5,3.8,darkWood,gate);
+const roof=box(0,7.15,0,15,.7,5,tile,gate);roof.rotation.z=.03;
+box(0,4.5,0,7,1,1.8,darkWood,gate);
+
+const house=new THREE.Group();scene.add(house);house.position.set(0,lunarY(0,16),16);
+
+// --- Earth View House 001 : high-fidelity architectural shell ---
+const stucco=new THREE.MeshStandardMaterial({color:0xe7e1d5,roughness:.92,metalness:0});
+const charcoal=new THREE.MeshStandardMaterial({color:0x20242a,roughness:.56,metalness:.12});
+const concrete=new THREE.MeshStandardMaterial({color:0x77797d,roughness:.96});
+const glassMat=new THREE.MeshPhysicalMaterial({color:0x9bc7df,transparent:true,opacity:.34,roughness:.08,metalness:.05,transmission:.18,thickness:.12});
+const warmGlass=new THREE.MeshPhysicalMaterial({color:0xf0c38b,transparent:true,opacity:.22,roughness:.12,transmission:.12,thickness:.1});
+const woodTexCanvas=document.createElement('canvas');woodTexCanvas.width=512;woodTexCanvas.height=256;
+const wx=woodTexCanvas.getContext('2d');wx.fillStyle='#7a5137';wx.fillRect(0,0,512,256);
+for(let y=0;y<256;y+=16){wx.fillStyle=(y/16)%2?'#6d452f':'#83593e';wx.fillRect(0,y,512,12)}
+for(let k=0;k<120;k++){wx.fillStyle='rgba(45,25,15,.12)';wx.fillRect(Math.random()*512,Math.random()*256,20+Math.random()*80,1)}
+const woodTex=new THREE.CanvasTexture(woodTexCanvas);woodTex.wrapS=woodTex.wrapT=THREE.RepeatWrapping;woodTex.repeat.set(3,2);woodTex.colorSpace=THREE.SRGBColorSpace;
+const wood=new THREE.MeshStandardMaterial({map:woodTex,roughness:.72});
+const floorMat=new THREE.MeshStandardMaterial({color:0xb58a60,roughness:.7});
+
+function addBox(x,y,z,w,h,d,m,parent=house){return box(x,y,z,w,h,d,m,parent)}
+function addWindow(x,y,z,w,h,rotY=0){
+  const frame=new THREE.Group();frame.position.set(x,y,z);frame.rotation.y=rotY;house.add(frame);
+  box(0,0,0,w,h,.12,glassMat,frame);
+  box(-w/2,0,.02,.12,h,.22,charcoal,frame); box(w/2,0,.02,.12,h,.22,charcoal,frame);
+  box(0,h/2,.02,w,.12,.22,charcoal,frame); box(0,-h/2,.02,w,.12,.22,charcoal,frame);
+  return frame;
+}
+
+// foundation and slabs
+addBox(0,.18,0,17.6,.36,13.6,concrete);
+addBox(0,3.22,0,16.4,.24,12.4,concrete);
+addBox(0,6.35,0,16.6,.28,12.6,charcoal);
+
+// side walls
+addBox(-8.0,1.72,0,.35,3.0,12.2,stucco);
+addBox(8.0,1.72,0,.35,3.0,12.2,stucco);
+addBox(-8.0,4.78,0,.35,2.9,12.2,stucco);
+addBox(8.0,4.78,0,.35,2.9,12.2,stucco);
+
+// rear wall + service core
+addBox(0,1.72,-6.0,16.2,3.0,.32,stucco);
+addBox(0,4.78,-6.0,16.2,2.9,.32,stucco);
+addBox(4.9,1.72,-1.0,5.8,3.0,.22,wood);
+addBox(4.9,4.78,-1.0,5.8,2.9,.22,wood);
+
+// Earth-view facade: wide glazed face toward entrance
+addWindow(-4.05,1.8,6.02,7.1,2.65,0);
+addWindow(4.05,1.8,6.02,7.1,2.65,0);
+addWindow(-4.05,4.82,6.02,7.1,2.45,0);
+addWindow(4.05,4.82,6.02,7.1,2.45,0);
+
+// timber vertical mullions / facade rhythm
+for(const x of [-7.2,-5.4,-3.6,-1.8,0,1.8,3.6,5.4,7.2]) addBox(x,3.3,6.18,.09,6.3,.28,wood);
+
+// deep roof overhang and floating roof
+addBox(0,6.72,0,18.8,.32,15.2,charcoal);
+const roof1=addBox(0,7.05,-1.7,18.6,.5,8.2,charcoal);roof1.rotation.x=-0.035;
+const roof2=addBox(0,7.18,3.7,18.6,.5,4.8,charcoal);roof2.rotation.x=0.045;
+
+// recessed entry portal
+addBox(-5.8,1.68,5.2,3.4,2.9,.24,wood);
+addBox(-5.8,1.58,6.18,2.0,2.65,.14,warmGlass);
+addBox(-5.8,3.05,5.55,3.6,.16,1.5,charcoal);
+
+// balcony / terrace
+addBox(0,3.38,7.25,10.5,.24,2.2,floorMat);
+for(const x of [-5.0,-3.3,-1.6,0,1.6,3.3,5.0]) addBox(x,4.0,8.18,.08,1.2,.12,charcoal);
+addBox(0,4.58,8.18,10.2,.08,.12,charcoal);
+
+// interior floors visible through facade
+addBox(0,.42,0,15.4,.16,11.3,floorMat);
+addBox(0,3.46,0,15.4,.16,11.3,floorMat);
+
+// stairs
+const stairMat=new THREE.MeshStandardMaterial({color:0x4f4740,roughness:.78});
+for(let i=0;i<13;i++) addBox(4.5,.55+i*.23,2.9-i*.42,2.8,.2,.48,stairMat);
+
+// minimal real-house furniture silhouettes
+const sofaMat=new THREE.MeshStandardMaterial({color:0xd7c4a8,roughness:.88});
+addBox(-2.6,1.05,2.0,4.2,.75,1.5,sofaMat);
+addBox(-2.6,.72,.4,1.8,.16,1.1,charcoal);
+addBox(2.3,1.05,1.3,2.5,.9,1.1,wood);
+addBox(-2.7,4.1,1.6,3.7,.45,2.0,new THREE.MeshStandardMaterial({color:0xc9c6bf,roughness:.9}));
+addBox(3.0,4.0,2.0,2.0,.65,1.0,wood);
+
+// warm interior fixtures
+const lampMat=new THREE.MeshStandardMaterial({color:0xffd39b,emissive:0xff9d50,emissiveIntensity:2.3,roughness:.4});
+for(const [x,y,z] of [[-3,2.75,2.7],[2.7,2.75,1.5],[-3,5.8,2.3],[3,5.8,1.4]]) addBox(x,y,z,.9,.08,.9,lampMat);
+const warm1=new THREE.PointLight(0xffc27a,5.2,28,2);warm1.position.set(-2.8,2.7,2.5);house.add(warm1);
+const warm2=new THREE.PointLight(0xffc27a,4.2,25,2);warm2.position.set(2.5,5.5,2.0);house.add(warm2);
+
+// exterior step and address monument
+addBox(-5.8,.22,7.2,4.0,.22,1.5,concrete);
+addBox(-10.2,1.0,17.0,1.4,2.0,.5,charcoal,scene);
+
+// path to house
+const pathMat=new THREE.MeshStandardMaterial({color:0x888b90,roughness:.98});
+for(let i=0;i<15;i++){const z=39-i*1.45;box(0,lunarY(0,z)+.08,z,4.2,.12,1.05,pathMat)}
+
+// collision volumes
+const colliders=[];
+function addCollider(min,max){colliders.push(new THREE.Box3(new THREE.Vector3(...min),new THREE.Vector3(...max)))}
+// gate
+addCollider([-6.6,0,42.5],[-3.4,6.4,45.5]);addCollider([3.4,0,42.5],[6.6,6.4,45.5]);
+// house outer walls, keep central/front access open
+addCollider([-8.2,0,9.7],[-7.35,6.7,22.3]);addCollider([7.35,0,9.7],[8.2,6.7,22.3]);addCollider([-8.2,0,9.7],[8.2,6.7,10.45]);
+
+const keys={};let yaw=0, pitch=-.04;let dragging=false,lastX=0,lastY=0;
+function setKey(k,v){keys[k]=v}
+addEventListener('keydown',e=>setKey(e.key.toLowerCase(),true));addEventListener('keyup',e=>setKey(e.key.toLowerCase(),false));
+canvas.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!dragging)return;yaw-=(e.clientX-lastX)*.005;pitch-=(e.clientY-lastY)*.004;pitch=Math.max(-1.25,Math.min(1.25,pitch));lastX=e.clientX;lastY=e.clientY});
+canvas.addEventListener('pointerup',()=>dragging=false);
+const statusEl=document.getElementById('status');
+function aimAt(target){
+  const d=target.clone().sub(camera.position).normalize();
+  yaw=Math.atan2(-d.x,-d.z);
+  pitch=Math.asin(d.y);
+}
+function goView(name){
+  const views={
+    gate:{p:new THREE.Vector3(0,lunarY(0,54)+2.1,54),t:new THREE.Vector3(0,3.4,44),s:'城門入口'},
+    house:{p:new THREE.Vector3(0,lunarY(0,34)+2.4,34),t:new THREE.Vector3(0,3.8,16),s:'Earth View House 正面'},
+    living:{p:new THREE.Vector3(-1.8,lunarY(-1.8,20.3)+2.0,20.3),t:new THREE.Vector3(-1.8,1.8,13.5),s:'一樓客廳'},
+    upper:{p:new THREE.Vector3(1.8,lunarY(1.8,20.0)+5.05,20.0),t:new THREE.Vector3(-2.0,4.7,13.2),s:'二樓 Earth View 臥室'},
+    earth:{p:new THREE.Vector3(0,lunarY(0,19.8)+5.1,19.8),t:earth.position.clone(),s:'二樓地球景觀'}
+  };
+  const v=views[name]; if(!v)return;
+  camera.position.copy(v.p); aimAt(v.t); statusEl.textContent='目前位置：'+v.s;
+}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>goView(b.dataset.view)));
+document.getElementById('reset').onclick=()=>goView('gate');
+
+const tmp=new THREE.Vector3();
+function blocked(p){for(const b of colliders){if(b.containsPoint(p))return true}return false}
+let prev=performance.now();
+function loop(t){requestAnimationFrame(loop);const dt=Math.min(.04,(t-prev)/1000);prev=t;
+ const f=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));const r=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+ tmp.set(0,0,0);if(keys.w||keys.arrowup)tmp.add(f);if(keys.s||keys.arrowdown)tmp.sub(f);if(keys.a||keys.arrowleft)tmp.sub(r);if(keys.d||keys.arrowright)tmp.add(r);
+ if(tmp.lengthSq()){tmp.normalize().multiplyScalar(8*dt);const np=camera.position.clone().add(tmp);if(!blocked(new THREE.Vector3(np.x,np.y,np.z))){camera.position.x=np.x;camera.position.z=np.z}}
+ if(keys.w||keys.s||keys.a||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright){camera.position.y=lunarY(camera.position.x,camera.position.z)+2.0;}
+ camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
+ renderer.render(scene,camera)
+}requestAnimationFrame(loop);
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+</script>
+</body></html>

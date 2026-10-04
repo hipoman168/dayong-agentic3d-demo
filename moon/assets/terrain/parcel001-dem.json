@@ -1,0 +1,131 @@
+{
+  "parcel_id": "NMW-FD001-R01-L01",
+  "dataset": "SLDEM2015",
+  "product_id": "SLDEM2015_512_00N_30N_000_045",
+  "source_file_sha256": "8d6e9bb9687bd19dbc9de57c8044932540bb934e5ef557b473660f5056484a73",
+  "coordinate_system_name": "MEAN EARTH/POLAR AXIS OF DE421",
+  "projection": "SIMPLE CYLINDRICAL",
+  "anchor": {
+    "lat_deg": 0.67,
+    "lon_deg": 23.47
+  },
+  "native_resolution_pix_per_deg": 512,
+  "native_map_scale_m_per_px": 59.2252938,
+  "sample_window": {
+    "width_px": 9,
+    "height_px": 9,
+    "center_pixel": [
+      12017,
+      15017
+    ]
+  },
+  "elevation_scale_m_per_dn": 0.5,
+  "center_elevation_m_relative_to_1737_4km": -1920.5,
+  "relative_elevation_m": [
+    [
+      -12.5,
+      -7.5,
+      -4.0,
+      -2.5,
+      -3.5,
+      -8.0,
+      -10.5,
+      -11.0,
+      -13.0
+    ],
+    [
+      -4.5,
+      -4.5,
+      -4.5,
+      -3.5,
+      -5.5,
+      -11.5,
+      -13.0,
+      -11.5,
+      -13.0
+    ],
+    [
+      1.5,
+      -1.5,
+      -5.5,
+      -5.0,
+      -6.0,
+      -9.0,
+      -9.5,
+      -8.0,
+      -10.0
+    ],
+    [
+      1.5,
+      -2.5,
+      -5.5,
+      -5.0,
+      -3.0,
+      -4.5,
+      -6.0,
+      -5.5,
+      -7.5
+    ],
+    [
+      0.0,
+      -4.0,
+      -6.0,
+      -2.5,
+      0.0,
+      -2.5,
+      -5.5,
+      -5.0,
+      -4.5
+    ],
+    [
+      0.0,
+      -1.0,
+      -3.0,
+      -1.5,
+      0.5,
+      -3.0,
+      -5.5,
+      -4.5,
+      -3.0
+    ],
+    [
+      4.0,
+      6.0,
+      4.5,
+      1.0,
+      -0.5,
+      -2.0,
+      -3.5,
+      -3.5,
+      -5.5
+    ],
+    [
+      8.5,
+      10.5,
+      9.5,
+      3.0,
+      0.0,
+      0.0,
+      -1.5,
+      -2.5,
+      -3.5
+    ],
+    [
+      7.0,
+      8.5,
+      6.5,
+      1.0,
+      -2.0,
+      -2.0,
+      -2.5,
+      -2.0,
+      -0.5
+    ]
+  ],
+  "render_policy": {
+    "layer": "REAL_TERRAIN_BASE",
+    "interpolation": "visual_only_inferred_between_native_samples",
+    "parcel_microterrain": "GENERATED_OVERLAY",
+    "measured_layer_protected": true
+  }
+}
