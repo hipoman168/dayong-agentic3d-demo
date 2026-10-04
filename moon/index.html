@@ -197,12 +197,6 @@ addCollider([-6.6,0,42.5],[-3.4,6.4,45.5]);addCollider([3.4,0,42.5],[6.6,6.4,45.
 // house outer walls, keep central/front access open
 addCollider([-8.2,0,9.7],[-7.35,6.7,22.3]);addCollider([7.35,0,9.7],[8.2,6.7,22.3]);addCollider([-8.2,0,9.7],[8.2,6.7,10.45]);
 
-
-function addCollider(min,max){colliders.push(new THREE.Box3(new THREE.Vector3(...min),new THREE.Vector3(...max)))}
-addCollider([-6.5,0,42.2,-0][0] ? [0,0,0]:[0,0,0],[0,0,0]);
-colliders.length=0;
-addCollider([-6.6,0,42.5],[-3.4,6.4,45.5]);addCollider([3.4,0,42.5],[6.6,6.4,45.5]);
-addCollider([-8.1,0,9.8],[-7.4,6.6,22.2]);addCollider([7.4,0,9.8],[8.1,6.6,22.2]);addCollider([-8.1,0,9.8],[8.1,6.6,10.5]);
 const keys={};let yaw=0, pitch=-.04;let dragging=false,lastX=0,lastY=0;
 function setKey(k,v){keys[k]=v}
 addEventListener('keydown',e=>setKey(e.key.toLowerCase(),true));addEventListener('keyup',e=>setKey(e.key.toLowerCase(),false));
