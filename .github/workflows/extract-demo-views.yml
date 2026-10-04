@@ -15,19 +15,23 @@ jobs:
       - name: Decode embedded sprite and crop three views
         shell: bash
         run: |
+          python -m pip install pillow
           python - <<'PY'
-          import re,base64
+          import re,base64,io
+          from PIL import Image,ImageEnhance
           s=open('index.html','r',encoding='utf-8').read()
-          m=re.search(r'const SPRITE="data:image/webp;base64,([^"]+)"',s)
-          if not m:
-              m=re.search(r'const SPRITE="data:image/jpeg;base64,([^"]+)"',s)
+          m=re.search(r'const SPRITE="data:image/(?:webp|jpeg);base64,([^"]+)"',s)
           if not m:
               raise SystemExit('SPRITE not found')
-          open('sprite.webp','wb').write(base64.b64decode(m.group(1)))
+          raw=base64.b64decode(m.group(1))
+          im=Image.open(io.BytesIO(raw)).convert('RGB')
+          im.save('sprite.webp','WEBP',quality=90)
+          names=['left','front','right']
+          for i,n in enumerate(names):
+              crop=im.crop((i*160,0,(i+1)*160,160)).resize((640,640),Image.Resampling.LANCZOS)
+              crop=ImageEnhance.Sharpness(crop).enhance(1.25)
+              crop.save(n+'.webp','WEBP',quality=88,method=6)
           PY
-          ffmpeg -y -i sprite.webp -vf "crop=160:160:0:0,scale=640:640:flags=lanczos" left.webp
-          ffmpeg -y -i sprite.webp -vf "crop=160:160:160:0,scale=640:640:flags=lanczos" front.webp
-          ffmpeg -y -i sprite.webp -vf "crop=160:160:320:0,scale=640:640:flags=lanczos" right.webp
       - name: Commit extracted images
         shell: bash
         run: |
