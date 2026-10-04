@@ -11,27 +11,30 @@ html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;fon
 #hud b{font-size:15px} #hud small{display:block;color:#b8c1d9;margin-top:4px;line-height:1.4}
 #status{margin-top:7px;font-size:12px;color:#9ef7c2}
 #cross{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.5;pointer-events:none}
-#touch{position:fixed;left:12px;bottom:14px;display:grid;grid-template-columns:48px 48px 48px;gap:6px;z-index:6}
-#touch button,#actions button{height:46px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.48);color:#fff;border-radius:10px;font-size:18px}
-#touch .blank{visibility:hidden}
-#actions{position:fixed;right:12px;bottom:14px;display:flex;gap:7px;z-index:6}
+#tour{position:fixed;left:10px;right:10px;bottom:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;z-index:7}
+#tour button,#actions button{min-height:46px;border:1px solid rgba(255,255,255,.22);background:rgba(7,10,16,.78);color:#fff;border-radius:10px;font-size:13px;padding:6px}
+#tour button:active,#actions button:active{background:#2b5b88}
+#actions{position:fixed;right:12px;bottom:68px;display:flex;gap:7px;z-index:7}
 #actions button{padding:0 14px;font-size:13px}
-@media(min-width:800px){#touch{opacity:.75}}
+@media(max-width:520px){#tour{grid-template-columns:repeat(3,1fr)}#actions{bottom:120px}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <div id="hud">
   <b>Moon World｜Parcel MW-P001</b>
-  <small>技術 PoC：月球地形＋古城門入口＋兩層 Earth View House。房子就在城門正後方，往前直走即可看到。</small>
-  <div id="status">WASD / 方向鍵移動，拖曳畫面轉向。先走進城門，再進住宅。</div>
+  <small>手機版改成「一鍵導覽」：不用找方向。直接按下面的地點，就會帶你到城門、房子、客廳、二樓與地球景觀。</small>
+  <div id="status">目前位置：月球入口。先按「看房子」。</div>
 </div>
 <div id="cross">＋</div>
-<div id="touch">
-  <span class="blank"></span><button data-k="w">▲</button><span class="blank"></span>
-  <button data-k="a">◀</button><button data-k="s">▼</button><button data-k="d">▶</button>
+<div id="tour">
+  <button data-view="gate">看城門</button>
+  <button data-view="house">看房子</button>
+  <button data-view="living">進客廳</button>
+  <button data-view="upper">上二樓</button>
+  <button data-view="earth">看地球</button>
 </div>
-<div id="actions"><button id="reset">回入口</button><button id="earth">看地球</button></div>
+<div id="actions"><button id="reset">回入口</button></div>
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 
@@ -70,10 +73,10 @@ scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size
 function lunarY(x,z){return .55*Math.sin(x*.06)+.4*Math.cos(z*.05)+.18*Math.sin((x+z)*.12)}
 const groundGeo=new THREE.PlaneGeometry(180,180,90,90);groundGeo.rotateX(-Math.PI/2);
 const pos=groundGeo.attributes.position;for(let i=0;i<pos.count;i++){const x=pos.getX(i),z=pos.getZ(i);pos.setY(i,lunarY(x,z))}groundGeo.computeVertexNormals();
-const ground=new THREE.Mesh(groundGeo,new THREE.MeshStandardMaterial({color:0x777775,roughness:1,metalness:0}));ground.receiveShadow=true;scene.add(ground);
+const ground=new THREE.Mesh(groundGeo,new THREE.MeshStandardMaterial({color:0x4b4d52,roughness:1,metalness:0}));ground.receiveShadow=true;scene.add(ground);
 
 const craterMat=new THREE.MeshStandardMaterial({color:0x626260,roughness:1});
-for(const [x,z,s] of [[-42,-28,7],[48,-45,10],[-53,24,6],[36,31,5]]){const ring=new THREE.Mesh(new THREE.TorusGeometry(s,1.4,10,48),craterMat);ring.rotation.x=Math.PI/2;ring.position.set(x,lunarY(x,z)+.25,z);scene.add(ring)}
+for(const [x,z,s] of [[-48,-42,7],[52,-48,10],[-58,34,6],[48,38,5]]){const ring=new THREE.Mesh(new THREE.TorusGeometry(s,1.4,10,48),craterMat);ring.rotation.x=Math.PI/2;ring.position.set(x,lunarY(x,z)+.25,z);scene.add(ring)}
 const rockMat=new THREE.MeshStandardMaterial({color:0x595957,roughness:1});
 for(let i=0;i<48;i++){const x=(Math.random()-.5)*155,z=(Math.random()-.5)*150;if(Math.abs(x)<18&&z>5&&z<58)continue;const s=.4+Math.random()*1.8;const r=new THREE.Mesh(new THREE.DodecahedronGeometry(s,0),rockMat);r.position.set(x,lunarY(x,z)+s*.65,z);r.rotation.set(Math.random(),Math.random(),Math.random());r.castShadow=true;scene.add(r)}
 
@@ -86,22 +89,26 @@ box(-5,3,0,3,6,3,plaster,gate);box(5,3,0,3,6,3,plaster,gate);box(0,6.1,0,13,1.5,
 const roof=box(0,7.15,0,15,.7,5,tile,gate);roof.rotation.z=.03;
 box(0,4.5,0,7,1,1.8,darkWood,gate);
 
-const house=new THREE.Group();scene.add(house);house.position.set(0,lunarY(0,-8),-8);
+const house=new THREE.Group();scene.add(house);house.position.set(0,lunarY(0,16),16);
 const wallMat=new THREE.MeshStandardMaterial({color:0xd7d2c6,roughness:.9});
 const frameMat=new THREE.MeshStandardMaterial({color:0x29231f,roughness:.75});
 const glassMat=new THREE.MeshStandardMaterial({color:0x8cb4d2,transparent:true,opacity:.45,roughness:.08,metalness:.12,emissive:0x183044,emissiveIntensity:.35});
 box(0,.15,0,16,.3,12,new THREE.MeshStandardMaterial({color:0x77706a,roughness:1}),house);
-for(const y of [1.6,4.8]){box(-7.8,y,0,.35,3.1,12,wallMat,house);box(7.8,y,0,.35,3.1,12,wallMat,house);box(0,y,5.8,16,3.1,.35,wallMat,house)}
+for(const y of [1.6,4.8]){box(-7.8,y,0,.35,3.1,12,wallMat,house);box(7.8,y,0,.35,3.1,12,wallMat,house);box(0,y,-5.8,16,3.1,.35,wallMat,house)}
 box(0,3.15,0,16,.28,12,frameMat,house);
 box(0,6.35,0,16,.3,12,frameMat,house);
 const roofHouse=box(0,7.15,0,17.5,1.1,13.5,new THREE.MeshStandardMaterial({color:0x34373d,roughness:.72}),house);
-box(0,3.2,-5.75,16,6.4,.35,glassMat,house);
-for(const x of [-5.3,0,5.3])box(x,3.2,-5.9,.22,6.1,.45,frameMat,house);
+box(0,3.2,5.75,16,6.4,.35,glassMat,house);
+for(const x of [-5.3,0,5.3])box(x,3.2,5.9,.22,6.1,.45,frameMat,house);
 box(0,1.6,0,.22,3.0,10,frameMat,house);
 box(-3.9,1.6,0,7.6,.18,.18,frameMat,house);
 box(3.9,1.6,1.7,7.6,.18,.18,frameMat,house);
 const stairMat=new THREE.MeshStandardMaterial({color:0x4f4740,roughness:.85});
 for(let i=0;i<12;i++)box(4.7,.25+i*.25,2.8-i*.45,3,.22,.5,stairMat,house);
+const warmMat=new THREE.MeshStandardMaterial({color:0xffd39b,emissive:0xff9b4a,emissiveIntensity:1.5,roughness:.6});
+box(-4.2,2.6,5.45,3.2,1.5,.15,warmMat,house);
+box(4.2,5.1,5.45,3.2,1.5,.15,warmMat,house);
+const houseLight=new THREE.PointLight(0xffc27a,3.2,26);houseLight.position.set(0,4,18);scene.add(houseLight);
 
 const pathMat=new THREE.MeshStandardMaterial({color:0x8e8a84,roughness:1});
 for(let i=0;i<26;i++){const z=37-i*2.1;box(0,lunarY(0,z)+.08,z,4,.12,1.65,pathMat)}
@@ -111,16 +118,32 @@ function addCollider(min,max){colliders.push(new THREE.Box3(new THREE.Vector3(..
 addCollider([-6.5,0,42.2,-0][0] ? [0,0,0]:[0,0,0],[0,0,0]);
 colliders.length=0;
 addCollider([-6.6,0,42.5],[-3.4,6.4,45.5]);addCollider([3.4,0,42.5],[6.6,6.4,45.5]);
-addCollider([-8.1,0,-14.2],[-7.4,6.6,-1.8]);addCollider([7.4,0,-14.2],[8.1,6.6,-1.8]);addCollider([-8.1,0,-2.2],[8.1,6.6,-1.5]);
+addCollider([-8.1,0,9.8],[-7.4,6.6,22.2]);addCollider([7.4,0,9.8],[8.1,6.6,22.2]);addCollider([-8.1,0,9.8],[8.1,6.6,10.5]);
 const keys={};let yaw=0, pitch=-.04;let dragging=false,lastX=0,lastY=0;
 function setKey(k,v){keys[k]=v}
 addEventListener('keydown',e=>setKey(e.key.toLowerCase(),true));addEventListener('keyup',e=>setKey(e.key.toLowerCase(),false));
 canvas.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
 canvas.addEventListener('pointermove',e=>{if(!dragging)return;yaw-=(e.clientX-lastX)*.005;pitch-=(e.clientY-lastY)*.004;pitch=Math.max(-1.25,Math.min(1.25,pitch));lastX=e.clientX;lastY=e.clientY});
 canvas.addEventListener('pointerup',()=>dragging=false);
-document.querySelectorAll('[data-k]').forEach(b=>{const k=b.dataset.k;b.addEventListener('pointerdown',e=>{e.preventDefault();setKey(k,true)});['pointerup','pointercancel','pointerleave'].forEach(n=>b.addEventListener(n,()=>setKey(k,false)))});
-document.getElementById('reset').onclick=()=>{camera.position.set(0,2.1,58);yaw=0;pitch=-.04};
-document.getElementById('earth').onclick=()=>{const d=earth.position.clone().sub(camera.position).normalize();yaw=Math.atan2(-d.x,-d.z);pitch=Math.asin(d.y)};
+const statusEl=document.getElementById('status');
+function aimAt(target){
+  const d=target.clone().sub(camera.position).normalize();
+  yaw=Math.atan2(-d.x,-d.z);
+  pitch=Math.asin(d.y);
+}
+function goView(name){
+  const views={
+    gate:{p:new THREE.Vector3(0,2.1,54),t:new THREE.Vector3(0,3.4,44),s:'城門入口'},
+    house:{p:new THREE.Vector3(0,2.2,36),t:new THREE.Vector3(0,3.7,16),s:'Earth View House 正面'},
+    living:{p:new THREE.Vector3(0,2.0,20.8),t:new THREE.Vector3(0,2.4,13),s:'一樓客廳'},
+    upper:{p:new THREE.Vector3(2.5,5.0,18),t:new THREE.Vector3(0,4.6,11),s:'二樓 Earth View 臥室'},
+    earth:{p:new THREE.Vector3(0,5.0,15.2),t:earth.position.clone(),s:'二樓地球景觀'}
+  };
+  const v=views[name]; if(!v)return;
+  camera.position.copy(v.p); aimAt(v.t); statusEl.textContent='目前位置：'+v.s;
+}
+document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>goView(b.dataset.view)));
+document.getElementById('reset').onclick=()=>goView('gate');
 
 const tmp=new THREE.Vector3();
 function blocked(p){for(const b of colliders){if(b.containsPoint(p))return true}return false}
@@ -129,7 +152,7 @@ function loop(t){requestAnimationFrame(loop);const dt=Math.min(.04,(t-prev)/1000
  const f=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw));const r=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
  tmp.set(0,0,0);if(keys.w||keys.arrowup)tmp.add(f);if(keys.s||keys.arrowdown)tmp.sub(f);if(keys.a||keys.arrowleft)tmp.sub(r);if(keys.d||keys.arrowright)tmp.add(r);
  if(tmp.lengthSq()){tmp.normalize().multiplyScalar(8*dt);const np=camera.position.clone().add(tmp);if(!blocked(new THREE.Vector3(np.x,np.y,np.z))){camera.position.x=np.x;camera.position.z=np.z}}
- camera.position.y=lunarY(camera.position.x,camera.position.z)+2.0;
+ if(keys.w||keys.s||keys.a||keys.d||keys.arrowup||keys.arrowdown||keys.arrowleft||keys.arrowright){camera.position.y=lunarY(camera.position.x,camera.position.z)+2.0;}
  camera.rotation.order='YXZ';camera.rotation.y=yaw;camera.rotation.x=pitch;
  renderer.render(scene,camera)
 }requestAnimationFrame(loop);
