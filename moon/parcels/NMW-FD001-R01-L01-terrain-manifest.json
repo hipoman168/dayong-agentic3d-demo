@@ -3,22 +3,37 @@
   "lunar_coordinate": {
     "lat_deg": 0.67,
     "lon_deg": 23.47,
-    "reference": "Moon mean-Earth / polar-axis compatible georeferencing; exact CRS to be frozen at DEM import"
+    "coordinate_system_name": "MEAN EARTH/POLAR AXIS OF DE421",
+    "projection": "SIMPLE CYLINDRICAL",
+    "positive_longitude_direction": "EAST"
   },
   "terrain_base": {
     "dataset": "SLDEM2015",
+    "product_id": "SLDEM2015_512_00N_30N_000_045",
     "provenance": "LRO LOLA + SELENE/Kaguya Terrain Camera merged DEM",
-    "nominal_horizontal_resolution_m_at_equator": 59,
-    "vertical_accuracy_m_typical": "3-4",
-    "source_class": "PUBLIC_DOMAIN_SCIENTIFIC_DATA",
-    "status": "SOURCE_SELECTED_NOT_YET_CROPPED"
+    "nominal_horizontal_resolution_m_at_equator": 59.2252938,
+    "native_resolution_pix_per_deg": 512,
+    "elevation_scale_m_per_dn": 0.5,
+    "center_elevation_m_relative_to_1737_4km": -1920.5,
+    "source_file_sha256": "8d6e9bb9687bd19dbc9de57c8044932540bb934e5ef557b473660f5056484a73",
+    "sample_window": {
+      "width_px": 9,
+      "height_px": 9,
+      "center_pixel": [
+        12017,
+        15017
+      ]
+    },
+    "source_class": "PUBLIC_SCIENTIFIC_DATA",
+    "status": "BOUND_TO_RENDERED_MACRO_TERRAIN"
   },
   "generated_overlay": {
     "microterrain": true,
     "rocks": true,
     "building": true,
     "interior": true,
-    "provenance_state": "MODEL_GENERATED"
+    "provenance_state": "MODEL_GENERATED",
+    "rule": "must_not_replace_or_relabel_measured_dem_layer"
   },
   "authority": {
     "scope": "NMW-FD001-R01-L01",
@@ -36,6 +51,7 @@
   "verification_gates": [
     "coordinate_binding_pass",
     "terrain_source_manifest_pass",
+    "native_dem_sample_pass",
     "parcel_boundary_pass",
     "non_target_fragment_hash_pass",
     "preview_before_commit_pass"
