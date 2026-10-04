@@ -1,0 +1,39 @@
+name: Extract Demo View Images
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/extract-demo-views.yml'
+permissions:
+  contents: write
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Decode embedded sprite and crop three views
+        shell: bash
+        run: |
+          python - <<'PY'
+          import re,base64
+          s=open('index.html','r',encoding='utf-8').read()
+          m=re.search(r'const SPRITE="data:image/webp;base64,([^"]+)"',s)
+          if not m:
+              m=re.search(r'const SPRITE="data:image/jpeg;base64,([^"]+)"',s)
+          if not m:
+              raise SystemExit('SPRITE not found')
+          open('sprite.webp','wb').write(base64.b64decode(m.group(1)))
+          PY
+          ffmpeg -y -i sprite.webp -vf "crop=160:160:0:0,scale=640:640:flags=lanczos" left.webp
+          ffmpeg -y -i sprite.webp -vf "crop=160:160:160:0,scale=640:640:flags=lanczos" front.webp
+          ffmpeg -y -i sprite.webp -vf "crop=160:160:320:0,scale=640:640:flags=lanczos" right.webp
+      - name: Commit extracted images
+        shell: bash
+        run: |
+          git config user.name "dayong-bot"
+          git config user.email "dayong-bot@users.noreply.github.com"
+          git add sprite.webp left.webp front.webp right.webp
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: publish demo reference view images"
+          git push
