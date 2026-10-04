@@ -1,0 +1,57 @@
+{
+  "project": "New Moon World",
+  "district_id": "NMW-FD-001",
+  "district_name_zh": "新月世界・創始地區 001",
+  "status": "POC_PLANNING_LOCKED",
+  "lunar_anchor": {
+    "region": "Mare Tranquillitatis",
+    "lat_deg": 0.67,
+    "lon_deg": 23.47,
+    "side_policy": "near-side only"
+  },
+  "land_unit": {
+    "name": "NLU",
+    "area_m2": 661,
+    "approx_ping": 200,
+    "nominal_square_side_m": 25.71
+  },
+  "demo_inventory": {
+    "saleable_parcels": 36,
+    "rows": 6,
+    "cols": 6,
+    "note": "POC inventory for masterplan validation; commercial cap to be approved separately"
+  },
+  "roads": [
+    {
+      "road_id": "RD-EV-01",
+      "name_zh": "地球景觀大道",
+      "name_en": "Earth View Avenue",
+      "orientation": "N-S",
+      "width_m": 10
+    },
+    {
+      "road_id": "RD-TR-01",
+      "name_zh": "靜海一路",
+      "name_en": "Tranquility Road 1",
+      "orientation": "E-W",
+      "width_m": 8
+    },
+    {
+      "road_id": "RD-TR-02",
+      "name_zh": "靜海二路",
+      "name_en": "Tranquility Road 2",
+      "orientation": "E-W",
+      "width_m": 8
+    }
+  ],
+  "parcel_id_format": "NMW-FD001-R{row:02}-L{lot:02}",
+  "rules": {
+    "persistent_ids": true,
+    "adjacent_merge_without_id_loss": true,
+    "real_lunar_coordinate_binding": true,
+    "terrain_provenance_required": true,
+    "preview_before_commit": true,
+    "scoped_build_authority": true,
+    "certificate_supported": true
+  }
+}
