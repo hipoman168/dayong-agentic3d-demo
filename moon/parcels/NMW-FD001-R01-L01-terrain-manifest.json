@@ -1,0 +1,43 @@
+{
+  "parcel_id": "NMW-FD001-R01-L01",
+  "lunar_coordinate": {
+    "lat_deg": 0.67,
+    "lon_deg": 23.47,
+    "reference": "Moon mean-Earth / polar-axis compatible georeferencing; exact CRS to be frozen at DEM import"
+  },
+  "terrain_base": {
+    "dataset": "SLDEM2015",
+    "provenance": "LRO LOLA + SELENE/Kaguya Terrain Camera merged DEM",
+    "nominal_horizontal_resolution_m_at_equator": 59,
+    "vertical_accuracy_m_typical": "3-4",
+    "source_class": "PUBLIC_DOMAIN_SCIENTIFIC_DATA",
+    "status": "SOURCE_SELECTED_NOT_YET_CROPPED"
+  },
+  "generated_overlay": {
+    "microterrain": true,
+    "rocks": true,
+    "building": true,
+    "interior": true,
+    "provenance_state": "MODEL_GENERATED"
+  },
+  "authority": {
+    "scope": "NMW-FD001-R01-L01",
+    "protected_layers": [
+      "REAL_TERRAIN_BASE",
+      "PARCEL_BOUNDARY",
+      "LUNAR_COORDINATE_BINDING"
+    ],
+    "editable_layers": [
+      "BUILDING",
+      "INTERIOR",
+      "LANDSCAPE_OVERLAY"
+    ]
+  },
+  "verification_gates": [
+    "coordinate_binding_pass",
+    "terrain_source_manifest_pass",
+    "parcel_boundary_pass",
+    "non_target_fragment_hash_pass",
+    "preview_before_commit_pass"
+  ]
+}
