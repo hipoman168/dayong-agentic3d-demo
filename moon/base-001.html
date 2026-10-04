@@ -1,42 +1,30 @@
 <!doctype html>
-<html lang="zh-Hant">
-<head>
+<html lang="zh-Hant"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>New Moon World｜Earth View House 001</title>
 <style>
-:root{--bg:#05070a;--panel:rgba(8,11,16,.78);--line:rgba(255,255,255,.14);--gold:#e8c27a;--text:#f7f7f5;--muted:#aab2bc}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#000;color:var(--text);font-family:Inter,system-ui,-apple-system,"Noto Sans TC",sans-serif;overflow:hidden}
-.stage{position:fixed;inset:0;background:#05070a}.scene{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.025);transition:opacity .65s ease,transform 1.2s ease}.scene.on{opacity:1;transform:scale(1)}
-.scene:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),transparent 35%,rgba(0,0,0,.62) 100%)}
-.top{position:fixed;z-index:10;left:18px;right:18px;top:16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.brand,.chip{background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:11px 14px}.brand b{display:block;font-size:14px;letter-spacing:.08em}.brand small,.chip{font-size:11px;color:var(--muted)}
-.bottom{position:fixed;z-index:10;left:18px;right:18px;bottom:max(18px,env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:14px;align-items:end}
-.info{max-width:660px;background:linear-gradient(90deg,rgba(4,6,9,.88),rgba(4,6,9,.38));border-left:2px solid var(--gold);padding:14px 16px}.eyebrow{color:var(--gold);font-size:11px;letter-spacing:.14em}.info h1{font-size:clamp(22px,4vw,40px);margin:4px 0 5px}.info p{margin:0;color:#d1d5db;font-size:13px}
-.nav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.nav button,.link{appearance:none;border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(12px);color:white;border-radius:999px;padding:10px 14px;font-size:12px;cursor:pointer;text-decoration:none}.nav button.on{border-color:#bd9450;color:#ffe2a8;background:rgba(76,52,18,.72)}
-.controls{position:fixed;z-index:10;right:18px;top:76px;display:flex;flex-direction:column;gap:8px}.controls a{width:42px;height:42px;display:grid;place-items:center;padding:0}
-.badge{position:fixed;z-index:10;left:18px;top:82px;background:rgba(22,49,32,.85);border:1px solid rgba(104,205,134,.45);color:#b9f5c9;border-radius:999px;padding:8px 11px;font-size:11px}
-@media(max-width:720px){.top{left:10px;right:10px;top:10px}.chip{display:none}.bottom{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));grid-template-columns:1fr;gap:10px}.info{padding:10px 12px}.info h1{font-size:24px}.info p{font-size:11px}.nav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.nav button{white-space:nowrap}.controls{right:10px;top:70px}.badge{left:10px;top:70px}}
-</style></head>
-<body>
+:root{--gold:#e8c27a;--muted:#aab2bc;--panel:rgba(8,11,16,.78);--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#000;color:#fff;font-family:Inter,system-ui,-apple-system,"Noto Sans TC",sans-serif;overflow:hidden}
+.stage{position:fixed;inset:0;background:#05070a}.scene{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transform:scale(1.025);transition:opacity .65s ease,transform 1.2s ease}.scene.on{opacity:1;transform:scale(1)}.scene:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),transparent 36%,rgba(0,0,0,.68))}
+.top{position:fixed;z-index:10;left:18px;right:18px;top:16px;display:flex;justify-content:space-between;gap:12px}.brand,.chip{background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:14px;padding:11px 14px}.brand b{display:block;font-size:14px;letter-spacing:.08em}.brand small,.chip{font-size:11px;color:var(--muted)}
+.badge{position:fixed;z-index:10;left:18px;top:82px;background:rgba(22,49,32,.86);border:1px solid rgba(104,205,134,.45);color:#b9f5c9;border-radius:999px;padding:8px 11px;font-size:11px}
+.controls{position:fixed;z-index:10;right:18px;top:76px;display:flex;flex-direction:column;gap:8px}.controls a,.nav button{border:1px solid var(--line);background:var(--panel);backdrop-filter:blur(12px);color:#fff;text-decoration:none;cursor:pointer}.controls a{width:42px;height:42px;display:grid;place-items:center;border-radius:999px}
+.bottom{position:fixed;z-index:10;left:18px;right:18px;bottom:max(18px,env(safe-area-inset-bottom));display:grid;grid-template-columns:minmax(260px,1fr) auto;gap:14px;align-items:end}.info{max-width:660px;background:linear-gradient(90deg,rgba(4,6,9,.9),rgba(4,6,9,.35));border-left:2px solid var(--gold);padding:14px 16px}.eyebrow{color:var(--gold);font-size:11px;letter-spacing:.14em}.info h1{font-size:clamp(22px,4vw,40px);margin:4px 0 5px}.info p{margin:0;color:#d1d5db;font-size:13px}.nav{display:flex;gap:8px}.nav button{border-radius:999px;padding:10px 14px;font-size:12px}.nav button.on{border-color:#bd9450;color:#ffe2a8;background:rgba(76,52,18,.72)}
+.note{position:fixed;z-index:9;left:18px;bottom:108px;color:#c8ced6;font-size:11px;background:rgba(0,0,0,.48);padding:7px 9px;border-radius:8px}
+@media(max-width:720px){.top{left:10px;right:10px;top:10px}.chip{display:none}.badge{left:10px;top:70px}.controls{right:10px;top:70px}.bottom{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));grid-template-columns:1fr}.info{padding:10px 12px}.info h1{font-size:24px}.info p{font-size:11px}.nav{justify-content:flex-start}.note{left:10px;bottom:130px}}
+</style></head><body>
 <div class="stage">
-  <div class="scene on" data-name="外觀" data-title="Earth View House 001" data-desc="地球景觀大道 001 號｜完成版示範住宅" style="background-image:url('./assets/base001/01-exterior.jpg')"></div>
-  <div class="scene" data-name="客廳" data-title="Earth View Living Room" data-desc="面向地球的主景觀客廳" style="background-image:url('./assets/base001/02-living-room.jpg')"></div>
-  <div class="scene" data-name="主臥" data-title="Master Bedroom" data-desc="日式極簡月球居住空間" style="background-image:url('./assets/base001/03-bedroom.jpg')"></div>
-  <div class="scene" data-name="觀景台" data-title="Earth View Deck" data-desc="專屬地球觀景平台" style="background-image:url('./assets/base001/04-earth-deck.jpg')"></div>
-  <div class="scene" data-name="中庭" data-title="Lunar Courtyard" data-desc="月面環境下的日式內庭" style="background-image:url('./assets/base001/05-courtyard.jpg')"></div>
+<div class="scene on" data-name="外觀" data-title="Earth View House 001" data-desc="地球景觀大道 001 號｜第一座完成示範住宅" style="background-image:url('./assets/base001/01-exterior.jpg')"></div>
+<div class="scene" data-name="客廳" data-title="Earth View Living Room" data-desc="面向地球的主景觀客廳｜日式木、石、玻璃材質系統" style="background-image:url('./assets/base001/02-living-room.jpg')"></div>
 </div>
 <div class="top"><div class="brand"><b>NEW MOON WORLD</b><small>FOUNDING DISTRICT 001 · MARE TRANQUILLITATIS</small></div><div class="chip">0.6700°N · 23.4700°E · 1 NLU ≈ 661 m²</div></div>
-<div class="badge">● DEMO RESIDENCE · BUILD COMPLETE</div>
-<div class="controls"><a class="link" href="./parcel-001.html" title="地塊">⌂</a><a class="link" href="./certificate-001.html" title="位置證明">✓</a><a class="link" href="./masterplan.html" title="總平面圖">⌗</a></div>
-<div class="bottom">
-  <div class="info"><div class="eyebrow" id="eyebrow">EXTERIOR · 01 / 05</div><h1 id="title">Earth View House 001</h1><p id="desc">地球景觀大道 001 號｜完成版示範住宅</p></div>
-  <div class="nav" id="nav"></div>
-</div>
+<div class="badge">● DEMO BUILD V1 · COMPLETE</div>
+<div class="controls"><a href="./parcel-001.html" title="地塊">⌂</a><a href="./certificate-001.html" title="位置證明">✓</a><a href="./masterplan.html" title="總平面圖">⌗</a></div>
+<div class="note">科學地形基底：SLDEM2015 已選定；Parcel 級 DEM 裁切／真實幾何綁定仍列為下一 Gate。</div>
+<div class="bottom"><div class="info"><div class="eyebrow" id="eyebrow">外觀 · 01 / 02</div><h1 id="title">Earth View House 001</h1><p id="desc">地球景觀大道 001 號｜第一座完成示範住宅</p></div><div class="nav" id="nav"></div></div>
 <script>
-const scenes=[...document.querySelectorAll('.scene')],nav=document.getElementById('nav');
-const t=document.getElementById('title'),d=document.getElementById('desc'),e=document.getElementById('eyebrow');
-function go(i){scenes.forEach((s,j)=>s.classList.toggle('on',i===j));[...nav.children].forEach((b,j)=>b.classList.toggle('on',i===j));t.textContent=scenes[i].dataset.title;d.textContent=scenes[i].dataset.desc;e.textContent=scenes[i].dataset.name.toUpperCase()+' · '+String(i+1).padStart(2,'0')+' / '+String(scenes.length).padStart(2,'0')}
+const scenes=[...document.querySelectorAll('.scene')],nav=document.getElementById('nav'),t=document.getElementById('title'),d=document.getElementById('desc'),e=document.getElementById('eyebrow');
+function go(i){scenes.forEach((s,j)=>s.classList.toggle('on',i===j));[...nav.children].forEach((b,j)=>b.classList.toggle('on',i===j));t.textContent=scenes[i].dataset.title;d.textContent=scenes[i].dataset.desc;e.textContent=scenes[i].dataset.name+' · '+String(i+1).padStart(2,'0')+' / '+String(scenes.length).padStart(2,'0')}
 scenes.forEach((s,i)=>{const b=document.createElement('button');b.textContent=s.dataset.name;b.onclick=()=>go(i);nav.appendChild(b)});go(0);
 let x0=null;addEventListener('touchstart',ev=>x0=ev.touches[0].clientX,{passive:true});addEventListener('touchend',ev=>{if(x0===null)return;const dx=ev.changedTouches[0].clientX-x0;if(Math.abs(dx)>45){const cur=scenes.findIndex(s=>s.classList.contains('on'));go((cur+(dx<0?1:-1)+scenes.length)%scenes.length)}x0=null},{passive:true});
-</script>
-</body></html>
+</script></body></html>
