@@ -46,8 +46,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;fon
 <button id="lightMode">夜景燈光</button>
 <button id="reset">回入口</button>
 </div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}
+</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
 const canvas=document.getElementById('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
@@ -212,16 +216,63 @@ const pinkMat=new THREE.MeshStandardMaterial({color:0xf2a5bf,roughness:.92,emiss
 const waterMat=new THREE.MeshPhysicalMaterial({color:0x1f6f86,transparent:true,opacity:.72,roughness:.12,metalness:.04,transmission:.18});
 
 // Living room: sectional sofa, coffee table, rug, console, fire feature
-addBox(-3.0,.92,2.15,4.5,.72,1.25,sofaMat);
-addBox(-4.55,.92,.85,1.35,.72,2.8,sofaMat);
+// Replaced by CC0 PBR glTF asset: addBox(-3.0,.92,2.15,4.5,.72,1.25,sofaMat);
+// Replaced by CC0 PBR glTF asset: addBox(-4.55,.92,.85,1.35,.72,2.8,sofaMat);
 addBox(-2.75,.53,.65,3.4,.06,2.5,fabric);
-addBox(-2.55,.78,.7,2.0,.22,1.15,blackStone);
+// Replaced by CC0 PBR glTF asset: addBox(-2.55,.78,.7,2.0,.22,1.15,blackStone);
 addBox(-2.55,.95,.7,1.45,.08,.55,new THREE.MeshStandardMaterial({color:0xe8a45c,emissive:0xff7a24,emissiveIntensity:2.2}));
 addBox(-6.6,1.05,-3.9,1.7,.12,4.0,wood);
 for(const z of [-5,-3.8,-2.6]) addBox(-6.55,1.55,z,1.45,.08,.78,goldMat);
 
 // Dining room: long table, 8 chairs, island
-addBox(2.55,.88,-2.4,4.8,.22,1.55,blackStone);
+// Replaced by CC0 PBR glTF asset: addBox(2.55,.88,-2.4,4.8,.22,1.55,blackStone);
+
+// CC0 PBR starter assets — Poly Haven, downloaded and served locally.
+// Runtime never calls the external asset API; files are frozen into our own asset manifest.
+const gltfLoader=new GLTFLoader();
+const loadedDesignAssets=[];
+async function placeDesignAsset(url,opt={}){
+  return new Promise((resolve,reject)=>{
+    gltfLoader.load(url,g=>{
+      const root=g.scene;
+      root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+      // Normalize by measured bounding width so furniture uses real-world-like proportions in our scene.
+      const b0=new THREE.Box3().setFromObject(root), sz=new THREE.Vector3();b0.getSize(sz);
+      const scale=(opt.targetWidth||sz.x)/Math.max(sz.x,.001);
+      root.scale.setScalar(scale);
+      root.rotation.y=opt.rotationY||0;
+      house.add(root);
+      root.updateMatrixWorld(true);
+      const b1=new THREE.Box3().setFromObject(root);
+      const pos=opt.position||new THREE.Vector3();
+      root.position.x += pos.x-(b1.min.x+b1.max.x)/2;
+      root.position.z += pos.z-(b1.min.z+b1.max.z)/2;
+      root.position.y += pos.y-b1.min.y;
+      root.userData={assetSource:'Poly Haven',license:'CC0',assetId:opt.assetId||'',provenance:'FROZEN_LOCAL_ASSET'};
+      loadedDesignAssets.push(root);
+      resolve(root);
+    },undefined,reject);
+  });
+}
+Promise.all([
+  placeDesignAsset('./assets/polyhaven/modern_arm_chair_01/modern_arm_chair_01_1k.gltf',{
+    assetId:'modern_arm_chair_01',targetWidth:1.25,rotationY:Math.PI*.12,position:new THREE.Vector3(-4.1,.46,2.0)
+  }),
+  placeDesignAsset('./assets/polyhaven/modern_arm_chair_01/modern_arm_chair_01_1k.gltf',{
+    assetId:'modern_arm_chair_01',targetWidth:1.25,rotationY:-Math.PI*.16,position:new THREE.Vector3(-1.7,.46,2.1)
+  }),
+  placeDesignAsset('./assets/polyhaven/modern_coffee_table_01/modern_coffee_table_01_1k.gltf',{
+    assetId:'modern_coffee_table_01',targetWidth:1.8,rotationY:0,position:new THREE.Vector3(-2.8,.46,.72)
+  }),
+  placeDesignAsset('./assets/polyhaven/dining_table/dining_table_1k.gltf',{
+    assetId:'dining_table',targetWidth:3.9,rotationY:Math.PI/2,position:new THREE.Vector3(2.55,.46,-2.4)
+  })
+]).then(()=>{
+  statusEl.textContent='PBR 家具載入完成：CC0 Starter Asset Pack';
+}).catch(err=>{
+  console.error('PBR asset load failed',err);
+});
+
 for(const x of [.7,1.9,3.2,4.45]){
   addBox(x,.63,-3.55,.72,.7,.72,cream);
   addBox(x,.63,-1.25,.72,.7,.72,cream);

@@ -1,0 +1,103 @@
+{
+  "license": "CC0",
+  "source": "Poly Haven",
+  "resolution": "1k",
+  "assets": {
+    "modern_arm_chair_01": {
+      "modern_arm_chair_01_1k.gltf": {
+        "bytes": 5121,
+        "md5": "a5ce303bc2962fe98b733fcdfa5a842b",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/modern_arm_chair_01/modern_arm_chair_01_1k.gltf"
+      },
+      "textures/modern_arm_chair_01_pillow_nor_gl_1k.jpg": {
+        "bytes": 302377,
+        "md5": "6804f34108fcc755f0c84dd3c638270c",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_arm_chair_01/modern_arm_chair_01_pillow_nor_gl_1k.jpg"
+      },
+      "textures/modern_arm_chair_01_legs_nor_gl_1k.jpg": {
+        "bytes": 560864,
+        "md5": "7cece7eccf75588af5b5df9b095d2c97",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_arm_chair_01/modern_arm_chair_01_legs_nor_gl_1k.jpg"
+      },
+      "textures/modern_arm_chair_01_pillow_arm_1k.jpg": {
+        "bytes": 321223,
+        "md5": "772495ddbf26ca3de4b31298f10113b9",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_arm_chair_01/modern_arm_chair_01_pillow_arm_1k.jpg"
+      },
+      "textures/modern_arm_chair_01_legs_diff_1k.jpg": {
+        "bytes": 460937,
+        "md5": "778f1897e07ff81b2bc338f3d463ad1f",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_arm_chair_01/modern_arm_chair_01_legs_diff_1k.jpg"
+      },
+      "textures/modern_arm_chair_01_legs_arm_1k.jpg": {
+        "bytes": 577931,
+        "md5": "9c69cb001df175bddf6d1c2436567fb7",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_arm_chair_01/modern_arm_chair_01_legs_arm_1k.jpg"
+      },
+      "modern_arm_chair_01.bin": {
+        "bytes": 240728,
+        "md5": "5a8f2ea1c79ea484140e484b2a621670",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/modern_arm_chair_01/modern_arm_chair_01.bin"
+      },
+      "textures/modern_arm_chair_01_pillow_diff_1k.jpg": {
+        "bytes": 228851,
+        "md5": "2e4f64c633c3cb1656ad3eabdb3f0607",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_arm_chair_01/modern_arm_chair_01_pillow_diff_1k.jpg"
+      }
+    },
+    "modern_coffee_table_01": {
+      "modern_coffee_table_01_1k.gltf": {
+        "bytes": 2771,
+        "md5": "f1c079ab5bc307630258cf3b40910511",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/modern_coffee_table_01/modern_coffee_table_01_1k.gltf"
+      },
+      "modern_coffee_table_01.bin": {
+        "bytes": 154864,
+        "md5": "6e8f65bff935af308eab9eff062f6daa",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/modern_coffee_table_01/modern_coffee_table_01.bin"
+      },
+      "textures/modern_coffee_table_01_rough_1k.jpg": {
+        "bytes": 403959,
+        "md5": "6ccbc448fa0e2bed32eac52511e84e2c",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_coffee_table_01/modern_coffee_table_01_rough_1k.jpg"
+      },
+      "textures/modern_coffee_table_01_diff_1k.jpg": {
+        "bytes": 410569,
+        "md5": "356014e027b59c21b3c99ac112e645f9",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_coffee_table_01/modern_coffee_table_01_diff_1k.jpg"
+      },
+      "textures/modern_coffee_table_01_nor_gl_1k.jpg": {
+        "bytes": 359134,
+        "md5": "d263e6131abc518760d6771390bc5066",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/modern_coffee_table_01/modern_coffee_table_01_nor_gl_1k.jpg"
+      }
+    },
+    "dining_table": {
+      "dining_table_1k.gltf": {
+        "bytes": 4165,
+        "md5": "556aed1f86536dba7cc5917c36ee7ab7",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/1k/dining_table/dining_table_1k.gltf"
+      },
+      "textures/dining_table_nor_gl_1k.jpg": {
+        "bytes": 707020,
+        "md5": "f9e982c15242ff9e544d4968c377abb2",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/dining_table/dining_table_nor_gl_1k.jpg"
+      },
+      "textures/dining_table_diff_1k.jpg": {
+        "bytes": 852259,
+        "md5": "a309bb6839c628305059775d7480c8b7",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/dining_table/dining_table_diff_1k.jpg"
+      },
+      "textures/dining_table_arm_1k.jpg": {
+        "bytes": 689497,
+        "md5": "0be0f4618ef26ce517ebf049e90bcc7c",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/1k/dining_table/dining_table_arm_1k.jpg"
+      },
+      "dining_table.bin": {
+        "bytes": 30992,
+        "md5": "13227e80b4c213bd7fee570e0b23fe8c",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/dining_table/dining_table.bin"
+      }
+    }
+  }
+}
