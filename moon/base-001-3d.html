@@ -24,7 +24,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;fon
 <canvas id="c"></canvas>
 <div id="hud">
   <b>New Moon World｜Earth View House 001 · 3D</b>
-  <small>真實 SLDEM2015 巨觀地形 + 可走動建築幾何。手機用一鍵導覽；桌面可用 WASD＋滑鼠自由探索。</small>
+  <small>真實 SLDEM2015 巨觀地形 + 可走動建築幾何 + CC0 PBR 家具與庭園資產。手機一鍵導覽；桌面可用 WASD＋滑鼠自由探索。</small>
   <div id="status">目前位置：Founding Parcel 001。SLDEM2015 terrain bound.</div>
 </div>
 <div id="cross">＋</div><a id="photoLink" href="./base-001.html" style="position:fixed;right:12px;top:12px;z-index:8;color:#ffe0a3;text-decoration:none;background:rgba(5,8,16,.76);border:1px solid rgba(232,194,122,.45);padding:9px 12px;border-radius:10px;font-size:12px">Photoreal Tour</a>
@@ -272,6 +272,44 @@ Promise.all([
 }).catch(err=>{
   console.error('PBR asset load failed',err);
 });
+
+// CC0 Garden Asset Layer — landscape objects stay outside the measured terrain source layer.
+const gardenTemplates=new Map();
+function loadGardenTemplate(url){
+  if(gardenTemplates.has(url)) return gardenTemplates.get(url);
+  const p=new Promise((resolve,reject)=>gltfLoader.load(url,g=>resolve(g.scene),undefined,reject));
+  gardenTemplates.set(url,p);return p;
+}
+async function placeGardenAsset(url,opt={}){
+  const tpl=await loadGardenTemplate(url);
+  const root=tpl.clone(true);
+  root.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+  scene.add(root);root.updateMatrixWorld(true);
+  let b=new THREE.Box3().setFromObject(root),sz=new THREE.Vector3();b.getSize(sz);
+  const scale=(opt.targetWidth||sz.x)/Math.max(sz.x,.001);
+  root.scale.setScalar(scale);root.rotation.y=opt.rotationY||0;root.updateMatrixWorld(true);
+  b=new THREE.Box3().setFromObject(root);
+  const x=opt.x||0,z=opt.z||0,y=lunarY(x,z)+(opt.raise||0);
+  root.position.x += x-(b.min.x+b.max.x)/2;
+  root.position.z += z-(b.min.z+b.max.z)/2;
+  root.position.y += y-b.min.y;
+  root.userData={assetSource:'Poly Haven',license:'CC0',assetId:opt.assetId||'',provenance:'FROZEN_LOCAL_ASSET',layer:'GENERATED_GARDEN_OVERLAY'};
+  return root;
+}
+const gardenLoads=[
+  placeGardenAsset('./assets/polyhaven/rock_moss_set_01/rock_moss_set_01_1k.gltf',{assetId:'rock_moss_set_01',x:10.0,z:18.0,targetWidth:2.6,rotationY:.4}),
+  placeGardenAsset('./assets/polyhaven/rock_moss_set_01/rock_moss_set_01_1k.gltf',{assetId:'rock_moss_set_01',x:19.0,z:23.5,targetWidth:2.2,rotationY:1.2}),
+  placeGardenAsset('./assets/polyhaven/rock_moss_set_01/rock_moss_set_01_1k.gltf',{assetId:'rock_moss_set_01',x:16.8,z:14.5,targetWidth:1.8,rotationY:2.2}),
+  placeGardenAsset('./assets/polyhaven/shrub_01/shrub_01_1k.gltf',{assetId:'shrub_01',x:8.2,z:25.0,targetWidth:1.8,rotationY:.2}),
+  placeGardenAsset('./assets/polyhaven/shrub_01/shrub_01_1k.gltf',{assetId:'shrub_01',x:21.0,z:18.0,targetWidth:2.1,rotationY:1.1}),
+  placeGardenAsset('./assets/polyhaven/shrub_01/shrub_01_1k.gltf',{assetId:'shrub_01',x:11.2,z:12.2,targetWidth:1.5,rotationY:2.0}),
+  placeGardenAsset('./assets/polyhaven/Lantern_01/Lantern_01_1k.gltf',{assetId:'Lantern_01',x:9.0,z:29.0,targetWidth:.75,rotationY:0}),
+  placeGardenAsset('./assets/polyhaven/Lantern_01/Lantern_01_1k.gltf',{assetId:'Lantern_01',x:20.2,z:27.0,targetWidth:.75,rotationY:.5})
+];
+Promise.all(gardenLoads).then(()=>{
+  statusEl.textContent='CC0 PBR 家具＋庭園資產載入完成';
+}).catch(err=>console.error('Garden asset load failed',err));
+
 
 for(const x of [.7,1.9,3.2,4.45]){
   addBox(x,.63,-3.55,.72,.7,.72,cream);
