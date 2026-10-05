@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<link rel="icon" href="data:,"/>
+<title>New Moon World｜AI Exterior Studio PoC</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#05070b;color:#fff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#c{width:100%;height:100%;display:block}
+#top{position:fixed;left:14px;top:14px;z-index:5;width:min(410px,calc(100vw - 28px));background:rgba(8,12,20,.78);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:13px 14px;backdrop-filter:blur(12px);box-shadow:0 14px 50px rgba(0,0,0,.34)}
+#top h1{font-size:16px;margin:0 0 6px}
+#top p{font-size:12px;line-height:1.45;color:#c6cfdf;margin:0}
+#badge{display:inline-block;font-size:10px;letter-spacing:.08em;border:1px solid rgba(139,221,255,.35);color:#9fe9ff;padding:4px 7px;border-radius:999px;margin-bottom:8px}
+#stats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:9px}
+.stat{background:rgba(255,255,255,.06);border-radius:9px;padding:7px 5px;text-align:center}.stat b{display:block;font-size:12px}.stat span{font-size:9px;color:#9ba9bd}
+#bottom{position:fixed;left:12px;right:12px;bottom:12px;z-index:8;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+#bottom button{min-height:60px;border:1px solid rgba(255,255,255,.18);border-radius:13px;background:rgba(8,11,18,.86);color:#fff;padding:7px;font-size:12px;line-height:1.25}
+#bottom button small{display:block;color:#99abc4;font-size:9px;margin-top:3px}
+#bottom button.active{background:linear-gradient(135deg,rgba(41,98,137,.94),rgba(31,56,82,.94));border-color:#77cffa}
+#tools{position:fixed;right:14px;top:14px;z-index:7;display:flex;gap:6px}
+#tools button,#tools a{border:1px solid rgba(255,255,255,.18);background:rgba(8,11,18,.82);color:#fff;text-decoration:none;border-radius:10px;padding:9px 11px;font-size:11px}
+#note{position:fixed;right:14px;bottom:82px;z-index:5;width:260px;background:rgba(8,11,18,.68);border:1px solid rgba(255,255,255,.1);padding:9px 11px;border-radius:11px;font-size:10px;line-height:1.4;color:#aebbd0}
+@media(max-width:680px){#top{width:calc(100vw - 28px);box-sizing:border-box}#stats{grid-template-columns:repeat(2,1fr)}#tools{top:auto;bottom:153px;right:10px}#note{display:none}#bottom{grid-template-columns:1fr;bottom:8px;max-height:137px;overflow:auto}#bottom button{min-height:40px}#bottom button small{display:none}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="top">
+  <span id="badge">EXTERIOR DESIGN POC · SAME PARCEL / SAME ENVELOPE</span>
+  <h1 id="title">EX-01 日式庭院現代宅</h1>
+  <p id="desc">同一塊 NMW-FD001-R01-L01，在相同基地、退縮與高度限制下，AI 只改變建築設計語彙，不改變土地權利與法規邊界。</p>
+  <div id="stats">
+    <div class="stat"><b>661 m²</b><span>基地</span></div>
+    <div class="stat"><b>&lt; 50%</b><span>建蔽</span></div>
+    <div class="stat"><b>2F</b><span>樓層</span></div>
+    <div class="stat"><b>&lt; 12 m</b><span>高度</span></div>
+  </div>
+</div>
+<div id="tools"><button id="hero">外觀總覽</button><button id="earth">地球景觀</button><a href="./parcel-001.html">回地塊</a></div>
+<div id="note">拖曳旋轉 · 滾輪縮放。這是「外觀生成層」PoC：同一 Build Envelope 產生不同 silhouette、材質、屋頂、開窗、庭園與燈光策略。</div>
+<div id="bottom">
+  <button class="active" data-v="0">EX-01 日式庭院現代宅<small>深簷・木石・框景・中庭</small></button>
+  <button data-v="1">EX-03 雕塑型地標住宅<small>懸挑・切削量體・石材玻璃</small></button>
+  <button data-v="2">EX-06 天體未來建築<small>曲面・環形觀景・發光立面</small></button>
+</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.22;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x03050a);scene.fog=new THREE.Fog(0x03050a,120,520);
+const camera=new THREE.PerspectiveCamera(53,innerWidth/innerHeight,.1,700);camera.position.set(35,24,52);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,4,0);controls.maxPolarAngle=Math.PI*.49;controls.minDistance=16;controls.maxDistance=100;
+
+scene.add(new THREE.HemisphereLight(0x8fa5d0,0x151515,.85));
+const sun=new THREE.DirectionalLight(0xfff0cf,4.1);sun.position.set(-35,70,42);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-55;sun.shadow.camera.right=55;sun.shadow.camera.top=55;sun.shadow.camera.bottom=-55;scene.add(sun);
+const rim=new THREE.DirectionalLight(0x7aaaff,1.25);rim.position.set(45,25,-55);scene.add(rim);
+
+// Moon terrain
+const groundMat=new THREE.MeshStandardMaterial({color:0x55585d,roughness:1});
+const ggeo=new THREE.PlaneGeometry(210,210,90,90);ggeo.rotateX(-Math.PI/2);
+const gp=ggeo.attributes.position;
+for(let i=0;i<gp.count;i++){let x=gp.getX(i),z=gp.getZ(i);gp.setY(i,.45*Math.sin(x*.055)+.3*Math.cos(z*.065)+.12*Math.sin((x+z)*.21))}
+ggeo.computeVertexNormals();const ground=new THREE.Mesh(ggeo,groundMat);ground.receiveShadow=true;scene.add(ground);
+
+// Earth
+const earthCanvas=document.createElement('canvas');earthCanvas.width=512;earthCanvas.height=256;const ex=earthCanvas.getContext('2d');
+ex.fillStyle='#155493';ex.fillRect(0,0,512,256);ex.fillStyle='#61a866';
+[[120,115,44,29],[180,86,35,26],[310,137,49,30],[350,88,31,21],[255,170,38,24]].forEach(a=>{ex.beginPath();ex.ellipse(...a,0,0,Math.PI*2);ex.fill()});
+ex.fillStyle='rgba(255,255,255,.63)';for(let i=0;i<15;i++){ex.beginPath();ex.ellipse((i*73)%512,(i*47)%256,19+(i%3)*7,4+(i%2)*3,0,0,Math.PI*2);ex.fill()}
+const earth=new THREE.Mesh(new THREE.SphereGeometry(7,40,28),new THREE.MeshStandardMaterial({map:new THREE.CanvasTexture(earthCanvas),emissive:0x0b1c38,emissiveIntensity:.6}));
+earth.position.set(-72,43,-125);scene.add(earth);
+
+// parcel border
+const borderPts=[[-12.85,-12.85],[12.85,-12.85],[12.85,12.85],[-12.85,12.85],[-12.85,-12.85]].map(([x,z])=>new THREE.Vector3(x,.22,z));
+const borderGeo=new THREE.BufferGeometry().setFromPoints(borderPts);
+scene.add(new THREE.Line(borderGeo,new THREE.LineBasicMaterial({color:0x64c7ff,transparent:true,opacity:.48})));
+
+const mats={
+ wood:new THREE.MeshStandardMaterial({color:0x6e4934,roughness:.72}),
+ dark:new THREE.MeshStandardMaterial({color:0x1b2026,roughness:.48,metalness:.18}),
+ plaster:new THREE.MeshStandardMaterial({color:0xe8e1d4,roughness:.88}),
+ stone:new THREE.MeshStandardMaterial({color:0x77716b,roughness:.9}),
+ glass:new THREE.MeshPhysicalMaterial({color:0x8fc7e5,transparent:true,opacity:.35,roughness:.08,metalness:.05,transmission:.2}),
+ blackGlass:new THREE.MeshPhysicalMaterial({color:0x203242,transparent:true,opacity:.45,roughness:.05,metalness:.28}),
+ metal:new THREE.MeshStandardMaterial({color:0x69727c,roughness:.3,metalness:.78}),
+ white:new THREE.MeshStandardMaterial({color:0xdedfdc,roughness:.65,metalness:.08}),
+ glow:new THREE.MeshStandardMaterial({color:0x9eeeff,emissive:0x5ccfff,emissiveIntensity:3.2,roughness:.2}),
+ warm:new THREE.MeshStandardMaterial({color:0xffd3a0,emissive:0xffa14f,emissiveIntensity:2.6,roughness:.35}),
+ water:new THREE.MeshPhysicalMaterial({color:0x226f85,transparent:true,opacity:.72,roughness:.1,transmission:.15}),
+ green:new THREE.MeshStandardMaterial({color:0x365b40,roughness:.9}),
+ pink:new THREE.MeshStandardMaterial({color:0xeaa2bd,roughness:.9})
+};
+function box(p,x,y,z,w,h,d,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;p.add(o);return o}
+function cyl(p,x,y,z,rt,rb,h,m,seg=24){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),m);o.position.set(x,y,z);o.castShadow=true;p.add(o);return o}
+function sph(p,x,y,z,r,m){const o=new THREE.Mesh(new THREE.SphereGeometry(r,20,14),m);o.position.set(x,y,z);o.castShadow=true;p.add(o);return o}
+function win(p,x,y,z,w,h,rot=0,mat=mats.glass){const g=new THREE.Group();g.position.set(x,y,z);g.rotation.y=rot;p.add(g);box(g,0,0,0,w,h,.12,mat);box(g,-w/2,0,.03,.1,h,.18,mats.dark);box(g,w/2,0,.03,.1,h,.18,mats.dark);return g}
+function tree(p,x,z,s=1,pink=false){cyl(p,x,1.5*s,z,.13*s,.28*s,3*s,mats.wood);sph(p,x,3.2*s,z,1.05*s,pink?mats.pink:mats.green);sph(p,x-.7*s,2.95*s,z+.2*s,.75*s,pink?mats.pink:mats.green);sph(p,x+.75*s,3*s,z-.15*s,.72*s,pink?mats.pink:mats.green)}
+function landscapeBase(p){
+ box(p,0,.12,0,23.5,.22,23.5,new THREE.MeshStandardMaterial({color:0x474c4b,roughness:1}));
+ for(const z of [10.5,7.5,4.5])box(p,0,.25,z,3.0,.12,1.8,mats.stone);
+ for(const [x,z,s] of [[-9,8,.9],[9,8,.8],[-10,-7,.8],[10,-8,.9]])tree(p,x,z,s,x<0);
+}
+
+const variants=[];
+
+function japanese(){
+ const p=new THREE.Group();landscapeBase(p);
+ // L-shaped two-floor residence
+ box(p,-2.2,1.65,-1.4,14.5,3.0,8.2,mats.plaster);
+ box(p,-3.1,4.7,-2.3,12.3,2.9,6.4,mats.plaster);
+ box(p,5.2,1.65,1.0,4.3,3,7.2,mats.wood);
+ // deep eaves
+ box(p,-2.1,3.28,-1.2,16.8,.3,9.5,mats.dark);
+ box(p,-3.1,6.2,-2.3,14.4,.32,8.4,mats.dark);
+ // framed Earth-view glazing
+ win(p,-2.8,1.75,2.72,7.5,2.35);win(p,-3.2,4.75,.93,7.2,2.15);
+ // vertical timber screen
+ for(let x=1.0;x<5.8;x+=.48)box(p,x,1.7,4.62,.11,2.8,.22,mats.wood);
+ // courtyard pond + stepping stones
+ box(p,5.7,.28,-5.0,7.1,.1,4.3,mats.water);
+ for(let i=0;i<4;i++)box(p,3.4+i*1.45,.45,-5.0,1,.12,.7,mats.stone);
+ // warm lighting
+ for(const [x,y,z] of [[-5.7,2.55,2.6],[-1.8,2.55,2.6],[-5.4,5.5,.8]]){const l=new THREE.PointLight(0xffb56e,2.4,12,2);l.position.set(x,y,z);p.add(l)}
+ for(const x of [-8,-5,-2,1])box(p,x,.42,5.6,.65,.45,.65,mats.warm);
+ return p;
+}
+function sculptural(){
+ const p=new THREE.Group();landscapeBase(p);
+ // stepped/cantilevered massing
+ const a=box(p,-2.5,1.75,-1.8,14,3.2,7.4,mats.stone);a.rotation.y=-.055;
+ const b=box(p,1.0,4.85,-1.0,13.4,3.0,6.4,mats.white);b.rotation.y=.10;
+ const c=box(p,-5.7,2.2,2.7,5.8,4.2,3.2,mats.dark);c.rotation.y=-.18;
+ // carved glass slot
+ win(p,1.0,4.85,2.25,9.2,2.3,.10,mats.blackGlass);
+ win(p,-1.4,1.85,2.0,7.6,2.45,-.055);
+ // cantilever slab
+ const slab=box(p,2.7,6.42,-.5,15.2,.32,7.4,mats.dark);slab.rotation.y=.10;
+ // sculpture fin
+ const fin=box(p,7.2,3.3,-3.4,.38,6.6,5.4,mats.metal);fin.rotation.z=-.12;
+ // reflecting pool
+ box(p,-7.2,.28,-6.7,7.8,.11,3.1,mats.water);
+ // line lighting
+ for(const [x,z,w] of [[1.5,2.58,10],[-3.7,3.85,5],[-7.3,-4.5,4]]) box(p,x,.55,z,w,.07,.08,mats.warm);
+ return p;
+}
+function celestial(){
+ const p=new THREE.Group();landscapeBase(p);
+ // elliptical habitat shells + glass observation ring
+ const shellMat=new THREE.MeshStandardMaterial({color:0xb8bec6,roughness:.32,metalness:.52});
+ const dome=new THREE.Mesh(new THREE.SphereGeometry(7.1,48,28,0,Math.PI*2,0,Math.PI*.53),shellMat);dome.scale.set(1.35,.72,1);dome.rotation.x=Math.PI;dome.position.set(-1.6,4.4,-1.2);dome.castShadow=true;p.add(dome);
+ const core=box(p,-1.6,1.8,-1.2,14.8,3.3,8.8,mats.dark);
+ // observation ring
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(6.0,.34,16,64),mats.glow);ring.rotation.x=Math.PI/2;ring.scale.x=1.35;ring.position.set(-1.6,4.9,-1.2);p.add(ring);
+ // front panoramic glass
+ win(p,-1.6,2.1,3.23,10.7,2.6,0,mats.blackGlass);
+ // entrance airlock pod
+ const pod=cyl(p,7.7,1.7,1.2,2.2,2.2,3.4,shellMat,40);pod.rotation.z=Math.PI/2;
+ // luminous path
+ for(let z=10;z>4;z-=1.2)box(p,0,.38,z,2.8,.07,.16,mats.glow);
+ // solar/landscape fins
+ for(const x of [-10,-8,8,10]){const f=box(p,x,1.2,-7,1.6,2.3,.12,mats.blackGlass);f.rotation.z=x<0?.22:-.22}
+ return p;
+}
+
+[japanese,sculptural,celestial].forEach((fn,i)=>{const v=fn();v.visible=i===0;scene.add(v);variants.push(v)});
+
+const meta=[
+ {title:'EX-01 日式庭院現代宅',desc:'深簷、木石、控制開窗、框景與坪庭。Earth View 被當成空間主景，而不是背景貼圖。'},
+ {title:'EX-03 雕塑型地標住宅',desc:'切削、懸挑與錯位量體形成唯一輪廓；石材、金屬與大面玻璃共同構建立面。'},
+ {title:'EX-06 天體未來建築',desc:'曲面殼體、觀景環與發光立面；保留建築可辨識輪廓，同時強化「月球住宅」世界觀。'}
+];
+let current=0;
+function setVariant(i){
+ current=i;variants.forEach((v,k)=>v.visible=k===i);
+ document.querySelectorAll('#bottom button').forEach((b,k)=>b.classList.toggle('active',k===i));
+ document.getElementById('title').textContent=meta[i].title;document.getElementById('desc').textContent=meta[i].desc;
+}
+document.querySelectorAll('#bottom button').forEach((b,i)=>b.onclick=()=>setVariant(i));
+document.getElementById('hero').onclick=()=>{camera.position.set(35,24,52);controls.target.set(0,4,0);controls.update()};
+document.getElementById('earth').onclick=()=>{camera.position.set(18,12,25);controls.target.copy(earth.position.clone().multiplyScalar(.11));controls.update()};
+
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
+function loop(){requestAnimationFrame(loop);controls.update();renderer.render(scene,camera)}loop();
+</script>
+</body></html>
