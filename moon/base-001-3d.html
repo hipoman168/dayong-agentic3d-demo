@@ -156,24 +156,6 @@ function addWindow(x,y,z,w,h,rotY=0){
   return frame;
 }
 
-// GLB furniture asset loader (openPlan3D / CC0 Kenney-derived assets bench)
-const gltfLoader=new GLTFLoader();
-const realFurniture=new THREE.Group();house.add(realFurniture);
-function loadFurniture(file,x,y,z,rotY,targetW,targetH,targetD){
-  gltfLoader.load('./assets/interior/'+file,(gltf)=>{
-    const o=gltf.scene;
-    o.traverse(n=>{if(n.isMesh){n.castShadow=true;n.receiveShadow=true}});
-    const b=new THREE.Box3().setFromObject(o),sz=new THREE.Vector3();b.getSize(sz);
-    const sx=targetW/Math.max(sz.x,.001),sy=targetH/Math.max(sz.y,.001),szc=targetD/Math.max(sz.z,.001);
-    const sc=Math.min(sx,sy,szc);
-    o.scale.setScalar(sc);
-    o.rotation.y=rotY||0;
-    const b2=new THREE.Box3().setFromObject(o),mn=b2.min;
-    o.position.set(x-mn.x,y-mn.y,z-mn.z);
-    realFurniture.add(o);
-  },undefined,e=>console.warn('Furniture load failed',file,e));
-}
-
 // foundation and slabs
 addBox(0,.18,0,17.6,.36,13.6,concrete);
 addBox(0,3.22,0,16.4,.24,12.4,concrete);
@@ -232,15 +214,6 @@ const fabric=new THREE.MeshStandardMaterial({color:0x76726d,roughness:.95});
 const greenMat=new THREE.MeshStandardMaterial({color:0x34523a,roughness:.9});
 const pinkMat=new THREE.MeshStandardMaterial({color:0xf2a5bf,roughness:.92,emissive:0x2a0715,emissiveIntensity:.18});
 const waterMat=new THREE.MeshPhysicalMaterial({color:0x1f6f86,transparent:true,opacity:.72,roughness:.12,metalness:.04,transmission:.18});
-
-// High-quality GLB furniture layer
-loadFurniture('loungeDesignSofa.glb',-5.2,.52,1.25,0,4.8,1.25,2.2);
-loadFurniture('tableCoffee.glb',-3.5,.48,-.15,0,2.2,.65,1.4);
-loadFurniture('bedDouble.glb',-5.0,3.58,.25,0,4.6,1.55,3.2);
-loadFurniture('table.glb',1.0,.48,-3.35,0,4.5,1.25,1.9);
-for(const [x,z,r] of [[.8,-4.55,0],[2.0,-4.55,0],[3.2,-4.55,0],[4.4,-4.55,0],[.8,-1.9,Math.PI],[2.0,-1.9,Math.PI],[3.2,-1.9,Math.PI],[4.4,-1.9,Math.PI]]) loadFurniture('chairModernCushion.glb',x,.48,z,r,.8,1.15,.8);
-for(const [x,y,z] of [[-6.9,.45,4.3],[6.55,.45,4.1],[-6.4,.45,-4.8],[5.9,3.52,-4.7]]) loadFurniture('pottedPlant.glb',x,y,z,0,1.0,1.65,1.0);
-for(const [x,y,z] of [[-6.2,.45,2.1],[-.4,.45,2.3],[-5.7,3.52,2.5]]) loadFurniture('lampRoundFloor.glb',x,y,z,0,.8,1.8,.8);
 
 // Living room: sectional sofa, coffee table, rug, console, fire feature
 // Replaced by CC0 PBR glTF asset: addBox(-3.0,.92,2.15,4.5,.72,1.25,sofaMat);
@@ -499,8 +472,5 @@ function loop(t){requestAnimationFrame(loop);const dt=Math.min(.04,(t-prev)/1000
  renderer.render(scene,camera)
 }requestAnimationFrame(loop);
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix()}addEventListener('resize',resize);resize();
-</script>
-<script>
-window.NMW_ASSET_NOTICE={source:"openPlan3D bench",license:"MIT project / CC0 model-source policy; verify per-model provenance before commercial release",mode:"PoC"};
 </script>
 </body></html>
