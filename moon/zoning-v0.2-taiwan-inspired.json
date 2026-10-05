@@ -1,0 +1,285 @@
+{
+  "spec_id": "NMW-ZONING-V0.2",
+  "world": "New Moon World",
+  "status": "BASELINE_ADJUSTABLE",
+  "legal_reference_note": "Virtual-world governance rules inspired by Taiwan urban-planning and Taipei land-use controls; not a representation of real lunar property law or a direct copy of Taiwan building law.",
+  "reference_model": {
+    "taiwan_general": "Urban Planning Act / Enforcement Rules structure: residential, commercial, industrial and other use zones with differentiated use control.",
+    "taipei_density_reference": "Taipei residential/commercial/industrial coverage and FAR bands are used as a conservative starting benchmark, then adapted for New Moon World."
+  },
+  "immutable_calculation_rule": {
+    "site_area_basis": "REGISTERED_PARCEL_OR_MERGED_ESTATE_AREA",
+    "max_counted_gfa_formula": "site_area_m2 * far_percent / 100",
+    "max_footprint_formula": "site_area_m2 * bcr_percent / 100",
+    "statement": "Future FAR/BCR/height relaxations may change coefficients, but never the registered site-area basis."
+  },
+  "land_unit": {
+    "code": "NLU",
+    "area_m2": 661
+  },
+  "zones": [
+    {
+      "code": "R1",
+      "name_zh": "第一種住宅區",
+      "bcr_percent": 30,
+      "far_percent": 60,
+      "max_floors": 2,
+      "max_height_m": 10,
+      "min_site_nlu": 1,
+      "allowed_primary": [
+        "detached_house",
+        "villa"
+      ],
+      "office": false,
+      "industrial": false,
+      "ground_floor_retail": "NO"
+    },
+    {
+      "code": "R2",
+      "name_zh": "第二種住宅區",
+      "bcr_percent": 35,
+      "far_percent": 120,
+      "max_floors": 4,
+      "max_height_m": 16,
+      "min_site_nlu": 1,
+      "allowed_primary": [
+        "house",
+        "townhouse",
+        "small_apartment"
+      ],
+      "office": false,
+      "industrial": false,
+      "ground_floor_retail": "CONDITIONAL_NEIGHBORHOOD_SERVICE"
+    },
+    {
+      "code": "R3",
+      "name_zh": "第三種住宅區",
+      "bcr_percent": 45,
+      "far_percent": 225,
+      "max_floors": 12,
+      "max_height_m": 48,
+      "min_site_nlu": 2,
+      "allowed_primary": [
+        "apartment",
+        "condominium",
+        "serviced_residence"
+      ],
+      "office": false,
+      "industrial": false,
+      "ground_floor_retail": "ALLOWED_ON_DESIGNATED_FRONTAGE"
+    },
+    {
+      "code": "R4",
+      "name_zh": "第四種住宅區",
+      "bcr_percent": 50,
+      "far_percent": 300,
+      "max_floors": 20,
+      "max_height_m": 80,
+      "min_site_nlu": 4,
+      "allowed_primary": [
+        "highrise_residential",
+        "condominium",
+        "serviced_residence"
+      ],
+      "office": false,
+      "industrial": false,
+      "ground_floor_retail": "ALLOWED_ON_DESIGNATED_FRONTAGE"
+    },
+    {
+      "code": "C1",
+      "name_zh": "第一種商業區",
+      "bcr_percent": 55,
+      "far_percent": 360,
+      "max_floors": 24,
+      "max_height_m": 96,
+      "min_site_nlu": 2,
+      "allowed_primary": [
+        "retail",
+        "restaurant",
+        "office",
+        "hotel",
+        "residential_above_commercial"
+      ],
+      "office": true,
+      "industrial": false,
+      "ground_floor_retail": "ALLOWED"
+    },
+    {
+      "code": "C2",
+      "name_zh": "第二種商業區",
+      "bcr_percent": 65,
+      "far_percent": 560,
+      "max_floors": 36,
+      "max_height_m": 144,
+      "min_site_nlu": 4,
+      "allowed_primary": [
+        "retail",
+        "office",
+        "hotel",
+        "entertainment",
+        "mixed_use_residential"
+      ],
+      "office": true,
+      "industrial": false,
+      "ground_floor_retail": "ALLOWED"
+    },
+    {
+      "code": "C3",
+      "name_zh": "核心商業區",
+      "bcr_percent": 75,
+      "far_percent": 800,
+      "max_floors": 50,
+      "max_height_m": 200,
+      "min_site_nlu": 8,
+      "allowed_primary": [
+        "office_tower",
+        "shopping_center",
+        "hotel",
+        "mixed_use_residential",
+        "entertainment"
+      ],
+      "office": true,
+      "industrial": false,
+      "ground_floor_retail": "REQUIRED_ON_PRIMARY_FRONTAGE"
+    },
+    {
+      "code": "I1",
+      "name_zh": "第二種工業區",
+      "bcr_percent": 45,
+      "far_percent": 200,
+      "max_floors": 12,
+      "max_height_m": 60,
+      "min_site_nlu": 4,
+      "allowed_primary": [
+        "light_industry",
+        "warehouse",
+        "research",
+        "utility"
+      ],
+      "office": "ANCILLARY_ONLY",
+      "industrial": true,
+      "ground_floor_retail": "NO"
+    },
+    {
+      "code": "I2",
+      "name_zh": "第三種工業區",
+      "bcr_percent": 55,
+      "far_percent": 300,
+      "max_floors": 18,
+      "max_height_m": 80,
+      "min_site_nlu": 6,
+      "allowed_primary": [
+        "industry",
+        "logistics",
+        "research",
+        "manufacturing"
+      ],
+      "office": "ANCILLARY_ONLY",
+      "industrial": true,
+      "ground_floor_retail": "NO"
+    }
+  ],
+  "frontage_overlays": {
+    "R_SHOP_1F": {
+      "name_zh": "住宅區一樓店面指定路段",
+      "eligibility": [
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "conditions": [
+        "parcel_faces_designated_commercial_or_neighborhood_street",
+        "retail_use_limited_to_ground_floor_unless_separately_approved",
+        "independent_shop_unit_id_required",
+        "separate_customer_access_required",
+        "residential_access_must_remain_independent",
+        "noise_and_nuisance_use_prohibited"
+      ],
+      "examples": [
+        "cafe",
+        "convenience_store",
+        "boutique",
+        "gallery",
+        "showroom",
+        "small_service_shop"
+      ]
+    }
+  },
+  "strict_use_rules": [
+    {
+      "rule": "OFFICE_LOCATION",
+      "text": "Independent office buildings are permitted only in commercial zones C1-C3. Industrial zones may contain ancillary operational offices only."
+    },
+    {
+      "rule": "INDUSTRIAL_LOCATION",
+      "text": "Manufacturing and industrial uses are permitted only in industrial zones I1-I2 unless a special district variance exists."
+    },
+    {
+      "rule": "GROUND_FLOOR_SHOPS",
+      "text": "Residential ground-floor shops are allowed only where the R_SHOP_1F frontage overlay is registered."
+    },
+    {
+      "rule": "UNIT_REGISTRY",
+      "text": "Every residence, office and shop must have an independent persistent Unit ID and virtual address."
+    },
+    {
+      "rule": "EARTH_VIEW",
+      "text": "Registered Earth View corridors are protected across every zone and may further reduce the build envelope."
+    },
+    {
+      "rule": "NO_BUILD_RIGHT_BY_REQUEST",
+      "text": "Agent generation requests cannot override zoning, site area, FAR, BCR, height, setback or protected-view constraints."
+    }
+  ],
+  "build_envelope_required_fields": [
+    "parcel_ids",
+    "estate_id",
+    "site_area_m2",
+    "zone_code",
+    "frontage_overlay",
+    "bcr_percent",
+    "far_percent",
+    "max_footprint_m2",
+    "max_counted_gfa_m2",
+    "max_height_m",
+    "max_floors",
+    "setbacks",
+    "allowed_uses",
+    "earth_view_corridor"
+  ],
+  "unit_addressing": {
+    "hierarchy": [
+      "CelestialBody",
+      "District",
+      "ParcelOrEstate",
+      "Building",
+      "Floor",
+      "Unit"
+    ],
+    "residential_example": "NMW-FD001-E008-B01-F28-U-A",
+    "shop_example": "NMW-FD001-E008-B01-F01-S01",
+    "office_example": "NMW-FD001-E021-B02-F16-O1603",
+    "independent_certificate": true,
+    "independent_interior_authority": true
+  },
+  "variance_policy": {
+    "allowed": true,
+    "must_preserve_site_area_basis": true,
+    "may_adjust": [
+      "far_percent",
+      "bcr_percent",
+      "max_height_m",
+      "max_floors",
+      "setbacks",
+      "allowed_use"
+    ],
+    "requires": [
+      "district_review",
+      "infrastructure_capacity_check",
+      "earth_view_impact_check",
+      "neighbor_impact_check",
+      "authority_generation",
+      "evidence_record"
+    ]
+  }
+}
