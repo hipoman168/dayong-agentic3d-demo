@@ -11,12 +11,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;fon
 #hud b{font-size:15px} #hud small{display:block;color:#b8c1d9;margin-top:4px;line-height:1.4}
 #status{margin-top:7px;font-size:12px;color:#9ef7c2}
 #cross{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.5;pointer-events:none}
-#tour{position:fixed;left:10px;right:10px;bottom:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;z-index:7}
+#tour{position:fixed;left:10px;right:10px;bottom:12px;display:grid;grid-template-columns:repeat(9,1fr);gap:6px;z-index:7}
 #tour button,#actions button{min-height:46px;border:1px solid rgba(255,255,255,.22);background:rgba(7,10,16,.78);color:#fff;border-radius:10px;font-size:13px;padding:6px}
 #tour button:active,#actions button:active{background:#2b5b88}
 #actions{position:fixed;right:12px;bottom:68px;display:flex;gap:7px;z-index:7}
 #actions button{padding:0 14px;font-size:13px}
-@media(max-width:520px){#tour{grid-template-columns:repeat(3,1fr)}#actions{bottom:120px}}
+@media(max-width:760px){#tour{grid-template-columns:repeat(3,1fr)}#actions{bottom:170px}#hud{max-width:285px}#hud small{font-size:11px}}
 </style>
 </head>
 <body>
@@ -31,8 +31,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;fon
   <button data-view="gate">看城門</button>
   <button data-view="house">看房子</button>
   <button data-view="living">進客廳</button>
-  <button data-view="upper">上二樓</button>
+  <button data-view="dining">去餐廳</button>
+  <button data-view="bedroom">進主臥</button>
+  <button data-view="garden">看庭園</button>
+  <button data-view="cars">看跑車</button>
   <button data-view="earth">看地球</button>
+  <button data-view="upper">上二樓</button>
 </div>
 <div id="actions"><button id="reset">回入口</button></div>
 <script type="module">
@@ -108,6 +112,8 @@ const darkWood=new THREE.MeshStandardMaterial({color:0x2d211d,roughness:.8});
 const plaster=new THREE.MeshStandardMaterial({color:0xe3e1d9,roughness:.95});
 const tile=new THREE.MeshStandardMaterial({color:0x26282d,roughness:.8});
 function box(x,y,z,w,h,d,m,parent=scene){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function sphere(x,y,z,r,m,parent=scene){const o=new THREE.Mesh(new THREE.SphereGeometry(r,24,16),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
+function cyl(x,y,z,rt,rb,h,m,parent=scene){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,24),m);o.position.set(x,y,z);o.castShadow=true;parent.add(o);return o}
 const gate=new THREE.Group();scene.add(gate);gate.position.set(0,lunarY(0,44),44);
 box(-5,3,0,3,6,3,plaster,gate);box(5,3,0,3,6,3,plaster,gate);box(0,6.1,0,13,1.5,3.8,darkWood,gate);
 const roof=box(0,7.15,0,15,.7,5,tile,gate);roof.rotation.z=.03;
@@ -187,13 +193,53 @@ addBox(0,3.46,0,15.4,.16,11.3,floorMat);
 const stairMat=new THREE.MeshStandardMaterial({color:0x4f4740,roughness:.78});
 for(let i=0;i<13;i++) addBox(4.5,.55+i*.23,2.9-i*.42,2.8,.2,.48,stairMat);
 
-// minimal real-house furniture silhouettes
-const sofaMat=new THREE.MeshStandardMaterial({color:0xd7c4a8,roughness:.88});
-addBox(-2.6,1.05,2.0,4.2,.75,1.5,sofaMat);
-addBox(-2.6,.72,.4,1.8,.16,1.1,charcoal);
-addBox(2.3,1.05,1.3,2.5,.9,1.1,wood);
-addBox(-2.7,4.1,1.6,3.7,.45,2.0,new THREE.MeshStandardMaterial({color:0xc9c6bf,roughness:.9}));
-addBox(3.0,4.0,2.0,2.0,.65,1.0,wood);
+// --- demo palace interior furnishing ---
+const sofaMat=new THREE.MeshStandardMaterial({color:0xd8c8ae,roughness:.82});
+const cream=new THREE.MeshStandardMaterial({color:0xeee6d9,roughness:.86});
+const blackStone=new THREE.MeshStandardMaterial({color:0x141518,roughness:.32,metalness:.18});
+const goldMat=new THREE.MeshStandardMaterial({color:0xb08b48,roughness:.35,metalness:.72});
+const fabric=new THREE.MeshStandardMaterial({color:0x76726d,roughness:.95});
+const greenMat=new THREE.MeshStandardMaterial({color:0x34523a,roughness:.9});
+const pinkMat=new THREE.MeshStandardMaterial({color:0xf2a5bf,roughness:.92,emissive:0x2a0715,emissiveIntensity:.18});
+const waterMat=new THREE.MeshPhysicalMaterial({color:0x1f6f86,transparent:true,opacity:.72,roughness:.12,metalness:.04,transmission:.18});
+
+// Living room: sectional sofa, coffee table, rug, console, fire feature
+addBox(-3.0,.92,2.15,4.5,.72,1.25,sofaMat);
+addBox(-4.55,.92,.85,1.35,.72,2.8,sofaMat);
+addBox(-2.75,.53,.65,3.4,.06,2.5,fabric);
+addBox(-2.55,.78,.7,2.0,.22,1.15,blackStone);
+addBox(-2.55,.95,.7,1.45,.08,.55,new THREE.MeshStandardMaterial({color:0xe8a45c,emissive:0xff7a24,emissiveIntensity:2.2}));
+addBox(-6.6,1.05,-3.9,1.7,.12,4.0,wood);
+for(const z of [-5,-3.8,-2.6]) addBox(-6.55,1.55,z,1.45,.08,.78,goldMat);
+
+// Dining room: long table, 8 chairs, island
+addBox(2.55,.88,-2.4,4.8,.22,1.55,blackStone);
+for(const x of [.7,1.9,3.2,4.45]){
+  addBox(x,.63,-3.55,.72,.7,.72,cream);
+  addBox(x,.63,-1.25,.72,.7,.72,cream);
+}
+addBox(5.65,1.0,-3.7,2.7,.95,1.25,blackStone);
+addBox(5.65,1.52,-3.7,2.85,.12,1.35,goldMat);
+
+// Master bedroom upper floor: bed, headboard, benches, side tables
+addBox(-2.9,4.02,1.35,4.1,.52,2.35,cream);
+addBox(-2.9,4.55,.05,4.25,1.35,.22,wood);
+addBox(-2.9,4.37,1.42,3.7,.18,2.0,fabric);
+addBox(-5.35,4.0,.65,.75,.62,.75,blackStone);
+addBox(-.45,4.0,.65,.75,.62,.75,blackStone);
+addBox(-2.9,3.72,3.05,2.2,.28,.75,sofaMat);
+
+// Upper lounge / study
+addBox(3.15,4.08,1.8,2.7,.66,1.15,sofaMat);
+addBox(3.1,3.78,.25,1.65,.16,.9,blackStone);
+addBox(5.65,4.08,-1.1,2.2,.16,1.05,wood);
+
+// Decorative plants inside
+for(const [x,z] of [[-6.8,4.4],[6.7,4.2],[-6.3,-4.8],[6.1,-4.9]]){
+  cyl(x,.78,z,.28,.36,.65,blackStone,house);
+  cyl(x,1.5,z,.09,.12,1.25,wood,house);
+  sphere(x,2.15,z,.65,greenMat,house);
+}
 
 // warm interior fixtures
 const lampMat=new THREE.MeshStandardMaterial({color:0xffd39b,emissive:0xff9d50,emissiveIntensity:2.3,roughness:.4});
@@ -208,6 +254,53 @@ addBox(-10.2,1.0,17.0,1.4,2.0,.5,charcoal,scene);
 // path to house
 const pathMat=new THREE.MeshStandardMaterial({color:0x888b90,roughness:.98});
 for(let i=0;i<15;i++){const z=39-i*1.45;box(0,lunarY(0,z)+.08,z,4.2,.12,1.05,pathMat)}
+
+// --- Dream Garden: moon pond, arched bridge, sakura, supercars, service staff ---
+const gardenStone=new THREE.MeshStandardMaterial({color:0x73706a,roughness:.98});
+const lanternMat=new THREE.MeshStandardMaterial({color:0xffd59a,emissive:0xff9b46,emissiveIntensity:2.8,roughness:.38});
+const trunkMat=new THREE.MeshStandardMaterial({color:0x5a3827,roughness:.95});
+const redCar=new THREE.MeshStandardMaterial({color:0xb51f28,roughness:.24,metalness:.7});
+const whiteCar=new THREE.MeshStandardMaterial({color:0xe8e8e5,roughness:.24,metalness:.64});
+const blackCar=new THREE.MeshStandardMaterial({color:0x101216,roughness:.22,metalness:.82});
+const tireMat=new THREE.MeshStandardMaterial({color:0x090909,roughness:.88});
+const staffUniform=new THREE.MeshStandardMaterial({color:0x1b2027,roughness:.7});
+const skinMat=new THREE.MeshStandardMaterial({color:0xe1b18e,roughness:.8});
+
+// Pond to the east side
+const pond=box(14,lunarY(14,20)+.12,20,13,.16,9,waterMat); pond.rotation.y=-.08;
+for(const [x,z,r] of [[9,16,1.6],[11,24,1.2],[18,16,1.5],[19,24,1.8],[15,14.8,1.1]]) sphere(x,lunarY(x,z)+r*.35,z,r,gardenStone);
+
+// Arched bridge
+const bridge=new THREE.Group();scene.add(bridge);bridge.position.set(14,lunarY(14,20)+.25,20);
+for(let i=-5;i<=5;i++){const x=i*.62,y=.32+1.35*(1-Math.pow(i/5,2));box(x,y,0,0.72,.18,2.3,wood,bridge)}
+for(const z of [-1.25,1.25]){box(0,1.15,z,7.2,.1,.1,goldMat,bridge);for(let x=-3.5;x<=3.5;x+=.7)box(x,.85,z,.08,1.1,.08,goldMat,bridge)}
+
+// Sakura trees and moon-garden lighting
+for(const [x,z,sc] of [[-16,24,1.25],[-13,12,1.05],[18,31,1.25],[22,10,1.0],[-18,35,.9]]){
+  const y=lunarY(x,z);
+  cyl(x,y+2.2,z,.22,.42,4.4,trunkMat);
+  sphere(x,y+4.5,z,1.65*sc,pinkMat);sphere(x-1.1*sc,y+4.1,z+.3,1.15*sc,pinkMat);sphere(x+1.1*sc,y+4.2,z-.2,1.05*sc,pinkMat);
+}
+for(const [x,z] of [[-8,30],[8,30],[-10,20],[10,10],[22,20],[16,28]]){
+  const y=lunarY(x,z);box(x,y+.65,z,.42,1.15,.42,charcoal);box(x,y+1.38,z,.72,.62,.72,lanternMat);
+}
+
+// Supercar collection
+function addCar(x,z,color,rot=0){
+  const g=new THREE.Group();scene.add(g);g.position.set(x,lunarY(x,z)+.42,z);g.rotation.y=rot;
+  box(0,.42,0,3.4,.55,1.62,color,g);box(-.2,.82,0,1.85,.42,1.36,new THREE.MeshStandardMaterial({color:0x33404f,transparent:true,opacity:.76,roughness:.1,metalness:.25}),g);
+  box(1.35,.28,0,1.0,.2,1.72,color,g);
+  for(const xx of [-1.05,1.05])for(const zz of [-.82,.82]){const w=cyl(xx,.16,zz,.24,.24,.36,tireMat,g);w.rotation.x=Math.PI/2}
+}
+addCar(-14,17,redCar,-.08);addCar(-14,13,whiteCar,-.03);addCar(-14,9,blackCar,.02);
+
+// Concierge / attendants as stylized 3D staff
+function addStaff(x,z,rot=0){
+  const g=new THREE.Group();scene.add(g);g.position.set(x,lunarY(x,z),z);g.rotation.y=rot;
+  cyl(0,1.15,0,.33,.4,1.6,staffUniform,g);sphere(0,2.18,0,.32,skinMat,g);
+  box(-.46,1.25,0,.16,1.15,.16,staffUniform,g);box(.46,1.25,0,.16,1.15,.16,staffUniform,g);
+}
+addStaff(-4,37,0);addStaff(4,37,0);addStaff(-9,21,.2);
 
 // collision volumes
 const colliders=[];
@@ -233,9 +326,13 @@ function goView(name){
   const views={
     gate:{p:new THREE.Vector3(0,lunarY(0,54)+2.1,54),t:new THREE.Vector3(0,3.4,44),s:'城門入口'},
     house:{p:new THREE.Vector3(0,lunarY(0,34)+2.4,34),t:new THREE.Vector3(0,3.8,16),s:'Earth View House 正面'},
-    living:{p:new THREE.Vector3(-1.8,lunarY(-1.8,20.3)+2.0,20.3),t:new THREE.Vector3(-1.8,1.8,13.5),s:'一樓客廳'},
-    upper:{p:new THREE.Vector3(1.8,lunarY(1.8,20.0)+5.05,20.0),t:new THREE.Vector3(-2.0,4.7,13.2),s:'二樓 Earth View 臥室'},
-    earth:{p:new THREE.Vector3(0,lunarY(0,19.8)+5.1,19.8),t:earth.position.clone(),s:'二樓地球景觀'}
+    living:{p:new THREE.Vector3(-1.3,lunarY(-1.3,20.4)+1.9,20.4),t:new THREE.Vector3(-2.8,lunarY(0,16)+1.2,17.0),s:'一樓豪華客廳'},
+    dining:{p:new THREE.Vector3(4.2,lunarY(4.2,18.8)+1.8,18.8),t:new THREE.Vector3(2.6,lunarY(0,16)+1.1,13.5),s:'餐廳與中島廚房'},
+    bedroom:{p:new THREE.Vector3(-1.2,lunarY(-1.2,20.0)+4.85,20.0),t:new THREE.Vector3(-3.0,lunarY(0,16)+4.25,16.5),s:'二樓主人套房'},
+    garden:{p:new THREE.Vector3(8,lunarY(8,33)+3.0,33),t:new THREE.Vector3(14,lunarY(14,20)+1.2,20),s:'月球日式庭園與水景'},
+    cars:{p:new THREE.Vector3(-6,lunarY(-6,27)+2.8,27),t:new THREE.Vector3(-14,lunarY(-14,14)+.8,14),s:'私人超跑收藏區'},
+    upper:{p:new THREE.Vector3(1.8,lunarY(1.8,20.0)+5.05,20.0),t:new THREE.Vector3(-2.0,lunarY(0,16)+4.7,13.2),s:'二樓私人空間'},
+    earth:{p:new THREE.Vector3(1,lunarY(1,29)+2.3,29),t:earth.position.clone(),s:'戶外地球景觀台'}
   };
   const v=views[name]; if(!v)return;
   camera.position.copy(v.p); aimAt(v.t); statusEl.textContent='目前位置：'+v.s;
