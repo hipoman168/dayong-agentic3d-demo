@@ -44,9 +44,12 @@ html,body{margin:0;height:100%;overflow:hidden;background:#05070b;color:#fff;fon
   <button data-v="1">EX-03 雕塑型地標住宅<small>懸挑・切削量體・石材玻璃</small></button>
   <button data-v="2">EX-06 天體未來建築<small>曲面・環形觀景・發光立面</small></button>
 </div>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}
+</script>
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js';
+import * as THREE from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
