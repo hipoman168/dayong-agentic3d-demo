@@ -44,6 +44,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;fon
 <button id="dollhouse">Dollhouse</button>
 <button id="plan">平面圖</button>
 <button id="lightMode">夜景燈光</button>
+<button id="coffeeScene">咖啡看地球</button>
+<button id="musicToggle">播放音樂</button>
 <button id="reset">回入口</button>
 </div>
 <script type="importmap">
@@ -307,6 +309,52 @@ const area2=new THREE.RectAreaLight(0xffd7a8,4.2,4.8,2.2);area2.position.set(-2.
 // interior floors visible through facade
 addBox(0,.42,0,15.4,.16,11.3,floorMat);
 addBox(0,3.46,0,15.4,.16,11.3,floorMat);
+
+// --- Earth View Coffee Lounge ---
+// A signature lifestyle scene: coffee, warm indirect light, music and Earth beyond the glazing.
+const coffeeDark=new THREE.MeshStandardMaterial({color:0x2c231e,roughness:.62});
+const ceramic=new THREE.MeshStandardMaterial({color:0xe9e2d5,roughness:.48});
+const coffeeLiquid=new THREE.MeshStandardMaterial({color:0x3a1f12,roughness:.25,metalness:0});
+const brassWarm=new THREE.MeshStandardMaterial({color:0x9b7441,roughness:.32,metalness:.58});
+
+// lounge platform aligned to the Earth-view facade
+addBox(-2.4,.54,4.35,7.2,.18,2.7,wood);
+addBox(-2.4,.66,4.25,5.5,.08,1.9,new THREE.MeshStandardMaterial({color:0x776b60,roughness:.95}));
+
+// low lounge chairs
+function loungeChair(x,z,rot=0){
+  const g=new THREE.Group();g.position.set(x,.58,z);g.rotation.y=rot;house.add(g);
+  box(0,.38,0,1.28,.36,1.25,cream,g);
+  const back=box(0,.88,-.47,1.28,.92,.22,cream,g);back.rotation.x=-.16;
+  box(-.68,.48,0,.12,.55,1.12,coffeeDark,g);box(.68,.48,0,.12,.55,1.12,coffeeDark,g);
+}
+loungeChair(-4.35,4.35,-.16);loungeChair(-.55,4.35,.16);
+
+// premium coffee table
+cyl(-2.45,.74,4.10,1.0,1.0,.13,stoneDark,house);
+cyl(-2.45,.45,4.10,.13,.22,.55,brassWarm,house);
+
+// coffee cups
+function coffeeCup(x,z){
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.16,.14,.22,28),ceramic);
+  body.position.set(x,.98,z);body.castShadow=true;house.add(body);
+  const liquid=new THREE.Mesh(new THREE.CylinderGeometry(.135,.135,.015,28),coffeeLiquid);
+  liquid.position.set(x,1.095,z);house.add(liquid);
+  const handle=new THREE.Mesh(new THREE.TorusGeometry(.10,.025,10,22,Math.PI*1.5),ceramic);
+  handle.position.set(x+.15,1.0,z);handle.rotation.y=Math.PI/2;house.add(handle);
+}
+coffeeCup(-2.75,4.08);coffeeCup(-2.15,4.18);
+
+// coffee service counter
+addBox(4.9,1.05,4.05,3.1,1.05,.8,stoneDark);
+addBox(4.9,1.64,4.05,3.25,.12,.9,brassWarm);
+cyl(5.55,1.95,4.05,.18,.23,.48,blackMetal,house); // coffee machine silhouette
+addBox(4.45,1.98,4.04,.58,.55,.46,blackMetal);
+
+// concealed lounge lighting
+addBox(-2.4,2.92,5.72,6.9,.055,.08,warmLine);
+const cafeArea=new THREE.RectAreaLight(0xffc48a,5.5,6.5,2.1);
+cafeArea.position.set(-2.4,2.75,4.4);cafeArea.lookAt(-2.4,1.0,4.0);house.add(cafeArea);
 
 // stairs
 const stairMat=new THREE.MeshStandardMaterial({color:0x4f4740,roughness:.78});
@@ -710,6 +758,7 @@ function goView(name){
     gate:{p:new THREE.Vector3(0,lunarY(0,54)+2.1,54),t:new THREE.Vector3(0,3.4,44),s:'城門入口'},
     house:{p:new THREE.Vector3(14,lunarY(14,43)+7.8,43),t:new THREE.Vector3(-1,lunarY(0,16)+3.7,16),s:'示範豪宅 001｜圍界、前庭與高級外觀'},
     living:{p:new THREE.Vector3(-1.3,lunarY(-1.3,20.4)+1.9,20.4),t:new THREE.Vector3(-2.8,lunarY(0,16)+1.2,17.0),s:'一樓豪華客廳'},
+    coffee:{p:new THREE.Vector3(-2.25,lunarY(-2.25,20.0)+1.65,20.0),t:earth.position.clone(),s:'Earth View Coffee Lounge｜咖啡・音樂・地球景觀'},
     dining:{p:new THREE.Vector3(4.2,lunarY(4.2,18.8)+1.8,18.8),t:new THREE.Vector3(2.6,lunarY(0,16)+1.1,13.5),s:'餐廳與中島廚房'},
     bedroom:{p:new THREE.Vector3(-1.2,lunarY(-1.2,20.0)+4.85,20.0),t:new THREE.Vector3(-3.0,lunarY(0,16)+4.25,16.5),s:'二樓主人套房'},
     garden:{p:new THREE.Vector3(8,lunarY(8,33)+3.0,33),t:new THREE.Vector3(14,lunarY(14,20)+1.2,20),s:'月球景觀庭院｜圍界、水景與植栽'},
@@ -720,11 +769,39 @@ function goView(name){
   const v=views[name]; if(!v)return;
   camera.position.copy(v.p); aimAt(v.t); statusEl.textContent='目前位置：'+v.s;
 }
+// Original procedural ambient music — generated locally with Web Audio, no third-party recording.
+let audioCtx=null,musicNodes=[],musicOn=false;
+function startAmbientMusic(){
+  if(musicOn)return;
+  audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();
+  const master=audioCtx.createGain();master.gain.value=.055;master.connect(audioCtx.destination);
+  const filter=audioCtx.createBiquadFilter();filter.type='lowpass';filter.frequency.value=1150;filter.Q.value=.45;filter.connect(master);
+  const now=audioCtx.currentTime;
+  const freqs=[110,164.81,220,293.66];
+  freqs.forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type=i%2?'sine':'triangle';o.frequency.value=f;
+    g.gain.value=.04/(i+1);o.connect(g);g.connect(filter);o.start();
+    musicNodes.push(o,g);
+  });
+  // slow breathing modulation
+  const lfo=audioCtx.createOscillator(),lg=audioCtx.createGain();
+  lfo.frequency.value=.08;lg.gain.value=.018;lfo.connect(lg);lg.connect(master.gain);lfo.start();
+  musicNodes.push(lfo,lg,master,filter);musicOn=true;
+  document.getElementById('musicToggle').textContent='停止音樂';
+}
+function stopAmbientMusic(){
+  musicNodes.forEach(n=>{try{if(n.stop)n.stop()}catch(e){}try{if(n.disconnect)n.disconnect()}catch(e){}});
+  musicNodes=[];musicOn=false;document.getElementById('musicToggle').textContent='播放音樂';
+}
+function toggleMusic(){musicOn?stopAmbientMusic():startAmbientMusic()}
 document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>goView(b.dataset.view)));
 document.getElementById('overview').onclick=()=>setPresentation('overview');
 document.getElementById('dollhouse').onclick=()=>setPresentation('dollhouse');
 document.getElementById('plan').onclick=()=>setPresentation('plan');
 document.getElementById('lightMode').onclick=applyLightingMode;
+document.getElementById('coffeeScene').onclick=()=>{goView('coffee'); if(!musicOn) startAmbientMusic();};
+document.getElementById('musicToggle').onclick=toggleMusic;
 document.getElementById('reset').onclick=()=>goView('gate');
 
 const tmp=new THREE.Vector3();
