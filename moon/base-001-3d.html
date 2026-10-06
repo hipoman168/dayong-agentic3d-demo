@@ -192,10 +192,70 @@ addBox(-5.8,1.68,5.2,3.4,2.9,.24,wood);
 addBox(-5.8,1.58,6.18,2.0,2.65,.14,warmGlass);
 addBox(-5.8,3.05,5.55,3.6,.16,1.5,charcoal);
 
-// balcony / terrace
-addBox(0,3.38,7.25,10.5,.24,2.2,floorMat);
-for(const x of [-5.0,-3.3,-1.6,0,1.6,3.3,5.0]) addBox(x,4.0,8.18,.08,1.2,.12,charcoal);
-addBox(0,4.58,8.18,10.2,.08,.12,charcoal);
+// --- premium exterior redesign v2.3 ---
+// Goal: asymmetric Japanese-modern composition instead of a uniform rectangular box.
+const stoneDark=new THREE.MeshStandardMaterial({color:0x34302d,roughness:.82,metalness:.04});
+const stoneWarm=new THREE.MeshStandardMaterial({color:0x6f6458,roughness:.9,metalness:.02});
+const bronze=new THREE.MeshStandardMaterial({color:0x6f5132,roughness:.36,metalness:.66});
+const soffit=new THREE.MeshStandardMaterial({color:0x9a704c,roughness:.58});
+const blackMetal=new THREE.MeshStandardMaterial({color:0x111418,roughness:.3,metalness:.72});
+const warmLine=new THREE.MeshStandardMaterial({color:0xffd0a0,emissive:0xffa451,emissiveIntensity:3.5,roughness:.28});
+
+// Strong stone anchors break the original box mass.
+addBox(-7.45,2.05,3.15,1.0,4.05,5.6,stoneDark);
+addBox(6.65,2.0,1.0,1.15,3.9,4.8,stoneWarm);
+addBox(2.85,4.9,-4.95,2.15,2.7,1.15,stoneDark);
+
+// Floating upper pavilion shifted to the left.
+addBox(-2.25,6.55,1.65,11.8,.16,8.9,blackMetal);
+addBox(-2.25,6.32,1.65,12.7,.18,9.7,soffit);
+addBox(-2.2,4.95,4.85,10.8,2.35,.18,glassMat);
+
+// Deep cantilevered eaves at two different heights.
+addBox(-2.4,6.9,1.9,13.4,.26,10.2,charcoal);
+addBox(4.55,4.05,1.55,7.2,.24,8.6,charcoal);
+
+// Right-side single-storey glass pavilion.
+addBox(5.25,.42,2.25,5.1,.14,6.4,floorMat);
+addWindow(5.2,1.75,5.45,4.7,2.45,0);
+addWindow(7.55,1.75,2.45,5.7,2.45,Math.PI/2);
+addBox(5.25,3.05,2.25,5.9,.18,7.25,soffit);
+addBox(5.25,3.23,2.25,6.5,.20,7.8,charcoal);
+
+// Vertical timber fins form a premium entry screen.
+for(let x=-7.0;x<=-4.15;x+=.34){
+  addBox(x,2.05,5.93,.12,4.0,.25,wood);
+}
+// Second-storey feature fins.
+for(let x=.9;x<=3.3;x+=.32){
+  addBox(x,4.95,6.12,.10,2.55,.28,bronze);
+}
+
+// Stone-framed portal around the Earth-view facade.
+addBox(-.5,3.05,6.32,12.8,.28,.5,stoneDark);
+addBox(-6.78,3.05,6.32,.34,6.15,.5,stoneDark);
+addBox(5.78,3.05,6.32,.34,6.15,.5,stoneDark);
+
+// Warm concealed lighting integrated into architecture.
+for(const [x,y,z,w,d] of [
+  [-2.3,6.18,5.7,10.8,.08],
+  [5.15,2.92,5.45,4.7,.08],
+  [-5.65,3.03,5.82,3.1,.08],
+  [0,.55,6.35,11.5,.06]
+]) addBox(x,y,z,w,.055,d,warmLine);
+
+// balcony / terrace with glass guardrail rather than sparse bars
+addBox(-1.2,3.38,7.25,9.6,.24,2.2,floorMat);
+addBox(-1.2,4.05,8.18,9.2,1.25,.08,glassMat);
+addBox(-5.75,4.05,7.25,.08,1.25,1.85,glassMat);
+addBox(3.35,4.05,7.25,.08,1.25,1.85,glassMat);
+
+// Broad entrance steps create a real arrival sequence.
+for(let i=0;i<5;i++) addBox(-5.75,0.20+i*.13,8.35+i*.42,4.2+i*.55,.16,.72,stoneWarm);
+
+// Floating side terraces to articulate silhouette.
+addBox(6.25,.62,6.75,4.8,.18,2.4,stoneDark);
+addBox(-6.2,.60,6.85,3.1,.18,2.0,stoneDark);
 
 // interior floors visible through facade
 addBox(0,.42,0,15.4,.16,11.3,floorMat);
@@ -451,8 +511,8 @@ function setPresentation(mode){
   presentationMode=mode;
   setRoofVisible(mode==='walk');
   if(mode==='overview'){
-    camera.position.set(33,lunarY(33,48)+17,48);
-    aimAt(new THREE.Vector3(0,lunarY(0,16)+3.5,16));
+    camera.position.set(36,lunarY(36,52)+13.5,52);
+    aimAt(new THREE.Vector3(-.5,lunarY(0,16)+3.6,16));
     statusEl.textContent='展示模式：建築外觀總覽';
   }else if(mode==='dollhouse'){
     camera.position.set(25,lunarY(25,40)+20,40);
@@ -479,7 +539,7 @@ function goView(name){
   presentationMode='walk';setRoofVisible(true);
   const views={
     gate:{p:new THREE.Vector3(0,lunarY(0,54)+2.1,54),t:new THREE.Vector3(0,3.4,44),s:'城門入口'},
-    house:{p:new THREE.Vector3(0,lunarY(0,41)+6.2,41),t:new THREE.Vector3(0,lunarY(0,16)+3.7,16),s:'Earth View House 完整正面外觀'},
+    house:{p:new THREE.Vector3(14,lunarY(14,43)+7.8,43),t:new THREE.Vector3(-1,lunarY(0,16)+3.7,16),s:'Earth View House 高級外觀總覽'},
     living:{p:new THREE.Vector3(-1.3,lunarY(-1.3,20.4)+1.9,20.4),t:new THREE.Vector3(-2.8,lunarY(0,16)+1.2,17.0),s:'一樓豪華客廳'},
     dining:{p:new THREE.Vector3(4.2,lunarY(4.2,18.8)+1.8,18.8),t:new THREE.Vector3(2.6,lunarY(0,16)+1.1,13.5),s:'餐廳與中島廚房'},
     bedroom:{p:new THREE.Vector3(-1.2,lunarY(-1.2,20.0)+4.85,20.0),t:new THREE.Vector3(-3.0,lunarY(0,16)+4.25,16.5),s:'二樓主人套房'},
