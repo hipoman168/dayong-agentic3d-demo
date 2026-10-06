@@ -24,7 +24,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#03050a;color:#fff;fon
 <canvas id="c"></canvas>
 <div id="hud">
   <b>New Moon World｜Earth View House 001 · 3D</b>
-  <small>真實 SLDEM2015 巨觀地形 + 可走動建築幾何 + CC0 PBR 家具與庭園資產。手機一鍵導覽；桌面可用 WASD＋滑鼠自由探索。</small>
+  <small>真實 SLDEM2015 巨觀地形 + 可走動建築幾何 + CC0 PBR 家具、庭園與建築立面材質。手機一鍵導覽；桌面可用 WASD＋滑鼠自由探索。</small>
   <div id="status">目前位置：Founding Parcel 001。SLDEM2015 terrain bound.</div>
 </div>
 <div id="cross">＋</div><a id="photoLink" href="./base-001.html" style="position:fixed;right:12px;top:12px;z-index:8;color:#ffe0a3;text-decoration:none;background:rgba(5,8,16,.76);border:1px solid rgba(232,194,122,.45);padding:9px 12px;border-radius:10px;font-size:12px">Photoreal Tour</a>
@@ -137,8 +137,8 @@ const house=new THREE.Group();scene.add(house);house.position.set(0,lunarY(0,16)
 const stucco=new THREE.MeshStandardMaterial({color:0xe7e1d5,roughness:.92,metalness:0});
 const charcoal=new THREE.MeshStandardMaterial({color:0x20242a,roughness:.56,metalness:.12});
 const concrete=new THREE.MeshStandardMaterial({color:0x77797d,roughness:.96});
-const glassMat=new THREE.MeshPhysicalMaterial({color:0x9bc7df,transparent:true,opacity:.34,roughness:.08,metalness:.05,transmission:.18,thickness:.12});
-const warmGlass=new THREE.MeshPhysicalMaterial({color:0xf0c38b,transparent:true,opacity:.22,roughness:.12,transmission:.12,thickness:.1});
+const glassMat=new THREE.MeshPhysicalMaterial({color:0x9bc7df,transparent:true,opacity:.30,roughness:.06,metalness:.02,transmission:.32,thickness:.18,ior:1.46,clearcoat:.22,clearcoatRoughness:.08});
+const warmGlass=new THREE.MeshPhysicalMaterial({color:0xf0c38b,transparent:true,opacity:.20,roughness:.10,transmission:.24,thickness:.14,ior:1.46,clearcoat:.18});
 const woodTexCanvas=document.createElement('canvas');woodTexCanvas.width=512;woodTexCanvas.height=256;
 const wx=woodTexCanvas.getContext('2d');wx.fillStyle='#7a5137';wx.fillRect(0,0,512,256);
 for(let y=0;y<256;y+=16){wx.fillStyle=(y/16)%2?'#6d452f':'#83593e';wx.fillRect(0,y,512,12)}
@@ -200,6 +200,22 @@ const bronze=new THREE.MeshStandardMaterial({color:0x6f5132,roughness:.36,metaln
 const soffit=new THREE.MeshStandardMaterial({color:0x9a704c,roughness:.58});
 const blackMetal=new THREE.MeshStandardMaterial({color:0x111418,roughness:.3,metalness:.72});
 const warmLine=new THREE.MeshStandardMaterial({color:0xffd0a0,emissive:0xffa451,emissiveIntensity:3.5,roughness:.28});
+
+// Real CC0 facade materials (Poly Haven, locally frozen with manifest).
+const facadeLoader=new THREE.TextureLoader();
+function applyFacadeTexture(mat,base,repeatX,repeatY,bumpScale){
+  const diff=facadeLoader.load(base+'_diff_1k.jpg',t=>{
+    t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeatX,repeatY);t.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),8);mat.needsUpdate=true;
+  });
+  const bump=facadeLoader.load(base+'_disp_1k.jpg',t=>{
+    t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(repeatX,repeatY);mat.needsUpdate=true;
+  });
+  mat.map=diff;mat.bumpMap=bump;mat.bumpScale=bumpScale;
+}
+applyFacadeTexture(stoneDark,'./assets/polyhaven-materials/japanese_stone_wall/japanese_stone_wall',2.2,2.6,.16);
+applyFacadeTexture(stoneWarm,'./assets/polyhaven-materials/japanese_stone_wall/japanese_stone_wall',2.0,2.0,.11);
+applyFacadeTexture(wood,'./assets/polyhaven-materials/dark_wood/dark_wood',3.5,2.2,.07);
+applyFacadeTexture(stucco,'./assets/polyhaven-materials/white_plaster_02/white_plaster_02',3.0,2.0,.045);
 
 // Strong stone anchors break the original box mass.
 addBox(-7.45,2.05,3.15,1.0,4.05,5.6,stoneDark);
@@ -264,6 +280,29 @@ for(let i=0;i<5;i++) addBox(-5.75,0.20+i*.13,8.35+i*.42,4.2+i*.55,.16,.72,stoneW
 // Floating side terraces to articulate silhouette.
 addBox(6.25,.62,6.75,4.8,.18,2.4,stoneDark);
 addBox(-6.2,.60,6.85,3.1,.18,2.0,stoneDark);
+
+// Sculptural entry canopy and garden pergola increase real 3D parallax.
+addBox(-5.7,3.55,7.45,5.3,.24,3.25,blackMetal);
+addBox(-5.7,3.38,7.45,4.8,.10,2.95,soffit);
+for(let z=7.0;z<=9.0;z+=.42) addBox(-5.7,3.69,z,5.15,.10,.10,bronze);
+
+const pergola=new THREE.Group();house.add(pergola);pergola.position.set(5.6,.45,-4.0);
+for(const x of [-2.0,2.0])for(const z of [-1.5,1.5]) box(x,1.45,z,.18,2.9,.18,blackMetal,pergola);
+box(0,2.9,-1.5,4.3,.16,.18,blackMetal,pergola);box(0,2.9,1.5,4.3,.16,.18,blackMetal,pergola);
+for(let x=-1.9;x<=1.9;x+=.42) box(x,3.0,0,.12,.12,3.3,soffit,pergola);
+
+// Earth-view corner glazing projection: adds depth and a premium illuminated bay.
+addBox(-6.2,4.75,5.55,2.25,2.45,.12,glassMat);
+addBox(-7.28,4.75,4.55,.12,2.45,2.1,glassMat);
+addBox(-6.2,6.03,4.55,2.55,.18,2.35,soffit);
+addBox(-6.2,3.52,4.55,2.55,.16,2.35,stoneDark);
+
+// Architectural night lighting: concealed grazing on stone and warm interior area lights.
+for(const [x,y,z,intensity] of [[-7.05,2.0,3.4,3.4],[6.1,1.8,1.5,3.0],[-5.8,1.2,7.7,2.8]]){
+  const l=new THREE.SpotLight(0xffbd76,intensity,12,Math.PI/5,.55,1.5);l.position.set(x,y,z);l.target.position.set(x,y+2.1,z-.6);house.add(l,l.target);
+}
+const area1=new THREE.RectAreaLight(0xffc98f,5.0,5.5,2.5);area1.position.set(-2.8,2.35,4.2);area1.lookAt(-2.8,1.6,6.0);house.add(area1);
+const area2=new THREE.RectAreaLight(0xffd7a8,4.2,4.8,2.2);area2.position.set(-2.4,5.25,4.2);area2.lookAt(-2.4,4.6,6.0);house.add(area2);
 
 // interior floors visible through facade
 addBox(0,.42,0,15.4,.16,11.3,floorMat);

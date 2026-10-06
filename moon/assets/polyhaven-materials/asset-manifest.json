@@ -1,0 +1,43 @@
+{
+  "license": "CC0",
+  "source": "Poly Haven",
+  "resolution": "1k",
+  "assets": {
+    "japanese_stone_wall": {
+      "japanese_stone_wall_diff_1k.jpg": {
+        "bytes": 1028056,
+        "md5": "b4c088dad912242317866f042ccb83ab",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/japanese_stone_wall/japanese_stone_wall_diff_1k.jpg"
+      },
+      "japanese_stone_wall_disp_1k.jpg": {
+        "bytes": 287447,
+        "md5": "73a0a2865fbadbc5049f2f5eef5a60d6",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/japanese_stone_wall/japanese_stone_wall_disp_1k.jpg"
+      }
+    },
+    "dark_wood": {
+      "dark_wood_diff_1k.jpg": {
+        "bytes": 754754,
+        "md5": "47fa883f1bb33acc5711245f64b75975",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/dark_wood/dark_wood_diff_1k.jpg"
+      },
+      "dark_wood_disp_1k.jpg": {
+        "bytes": 606815,
+        "md5": "8a7a630f5d40802b85bc5f194c40b52a",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/dark_wood/dark_wood_disp_1k.jpg"
+      }
+    },
+    "white_plaster_02": {
+      "white_plaster_02_diff_1k.jpg": {
+        "bytes": 527219,
+        "md5": "7b10c2686bcfd76d1f309a20fd06b57e",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_02/white_plaster_02_diff_1k.jpg"
+      },
+      "white_plaster_02_disp_1k.jpg": {
+        "bytes": 282756,
+        "md5": "73f9cf2ee82e1a85c86ef9e607f50407",
+        "source": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/white_plaster_02/white_plaster_02_disp_1k.jpg"
+      }
+    }
+  }
+}
