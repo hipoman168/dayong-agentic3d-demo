@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<link rel="icon" href="data:,"/>
+<title>New Moon World｜Luxury Residence Test</title>
+<style>
+:root{--bg:#07101c;--panel:#0d1725;--line:rgba(255,255,255,.12);--muted:#9fb0c5;--gold:#e6bd75;--gold2:#8c6530}
+*{box-sizing:border-box}html,body{margin:0;background:radial-gradient(circle at 70% 0,#10284c 0,#08111e 34%,#05080d 78%);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{min-height:100vh}.shell{max-width:1480px;margin:0 auto;padding:20px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}.brand{letter-spacing:.26em;font-size:13px;color:#dbe6f3}.nav{display:flex;gap:8px;flex-wrap:wrap}.nav button,.nav a{border:1px solid var(--line);background:rgba(10,18,29,.72);color:#eaf1f8;border-radius:999px;padding:10px 15px;font-size:12px;text-decoration:none}
+.nav button.active{border-color:#e8c37d;color:#ffd995;background:rgba(116,78,29,.24)}
+.hero{position:relative;border:1px solid var(--line);border-radius:24px;overflow:hidden;min-height:600px;background:#090d13;box-shadow:0 30px 80px rgba(0,0,0,.38)}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.98) contrast(1.03)}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,9,16,.78),rgba(4,9,16,.18) 42%,rgba(4,9,16,.08)),linear-gradient(0deg,rgba(4,9,16,.68),transparent 50%)}
+.copy{position:relative;z-index:2;padding:58px 54px;width:min(660px,90%)}.eyebrow{font-size:12px;letter-spacing:.3em;color:#f0cf91;margin-bottom:16px}.copy h1{font-family:Georgia,"Times New Roman",serif;font-size:58px;line-height:1;margin:0 0 18px;font-weight:500}.copy p{color:#d4deeb;font-size:16px;line-height:1.7;margin:0 0 24px}.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{font-size:11px;border:1px solid rgba(230,189,117,.35);background:rgba(13,23,37,.6);padding:8px 10px;border-radius:10px;color:#f0d49e}
+.cta{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}.cta a,.cta button{padding:12px 16px;border-radius:11px;border:1px solid rgba(255,255,255,.15);background:#111c2c;color:#fff;text-decoration:none;font-weight:700}.cta .primary{background:linear-gradient(135deg,#e8bf75,#b17a37);color:#13100a;border:none}
+.grid{display:grid;grid-template-columns:1.3fr .7fr;gap:16px;margin-top:16px}.card{border:1px solid var(--line);background:rgba(9,16,27,.86);border-radius:20px;overflow:hidden}.card h3{margin:0;font-size:16px}.card .head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.muted{color:var(--muted);font-size:12px}
+.live{height:620px;background:#02050a}.live iframe{width:100%;height:100%;border:0;background:#000}
+.info{padding:18px}.statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.stat{border:1px solid var(--line);padding:14px;border-radius:14px;background:rgba(255,255,255,.025)}.stat b{display:block;font-size:22px;margin-bottom:4px}.stat span{font-size:11px;color:var(--muted)}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.tile{border:1px solid var(--line);border-radius:17px;overflow:hidden;background:#0a1019;min-height:220px;position:relative}.tile img{width:100%;height:100%;object-fit:cover;display:block}.tile .label{position:absolute;left:10px;right:10px;bottom:10px;padding:10px 12px;border-radius:10px;background:rgba(5,9,15,.72);backdrop-filter:blur(10px);font-size:12px}
+.modehide{display:none!important}
+@media(max-width:900px){.shell{padding:10px}.top{align-items:flex-start;flex-direction:column}.hero{min-height:560px}.copy{padding:38px 24px}.copy h1{font-size:42px}.grid{grid-template-columns:1fr}.live{height:560px}.gallery{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.hero{min-height:520px}.copy h1{font-size:36px}.copy p{font-size:14px}.gallery{grid-template-columns:1fr}.live{height:520px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <div class="brand">NEW MOON WORLD · LUXURY RESIDENCE TEST</div>
+    <div class="nav">
+      <button class="active" id="showExterior">外觀效果</button>
+      <button id="showLive">即時 3D</button>
+      <a href="./base-001-3d.html?v=22" target="_blank">全螢幕 3D</a>
+      <a href="./parcel-001.html">回地塊</a>
+    </div>
+  </div>
+
+  <section class="hero" id="exteriorView">
+    <img src="./assets/base001/01-exterior.jpg" alt="New Moon World residence exterior"/>
+    <div class="copy">
+      <div class="eyebrow">PARCEL 001 · EARTH VIEW RESIDENCE</div>
+      <h1>月球上的<br/>日式現代豪邸</h1>
+      <p>不是方盒子公寓，而是以深簷、木石材、玻璃、庭園、水景、框景與夜間建築照明共同形成的高級住宅體驗。建築外觀、室內、庭院與地球景觀採同一套設計語言。</p>
+      <div class="chips">
+        <span class="chip">日式庭院現代宅</span><span class="chip">Earth View</span><span class="chip">PBR 材質</span><span class="chip">暖色間接光</span><span class="chip">水景庭園</span><span class="chip">夜景照明</span>
+      </div>
+      <div class="cta">
+        <button class="primary" id="heroLive">進入即時 3D</button>
+        <a href="./exterior-studio-poc.html?v=1">比較 3 種外觀</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="card modehide" id="liveView">
+    <div class="head"><div><h3>Earth View House 001｜即時 3D</h3><div class="muted">WASD／手機導覽 · 外觀總覽 · Dollhouse · 平面圖 · 夜景燈光</div></div><span class="muted">REAL-TIME</span></div>
+    <div class="live"><iframe src="./base-001-3d.html?v=22" title="New Moon World 3D"></iframe></div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <div class="head"><div><h3>室內質感基準</h3><div class="muted">PBR 家具 + 間接光 + Earth View</div></div></div>
+      <div style="height:420px"><img src="./assets/base001/02-living-room.jpg" style="width:100%;height:100%;object-fit:cover" alt="living room"/></div>
+    </div>
+    <div class="card">
+      <div class="head"><div><h3>設計資料</h3><div class="muted">同一地塊、同一權限邊界</div></div></div>
+      <div class="info">
+        <div class="statgrid">
+          <div class="stat"><b>661 m²</b><span>基地面積</span></div>
+          <div class="stat"><b>2F</b><span>示範樓層</span></div>
+          <div class="stat"><b>Earth</b><span>核心景觀</span></div>
+          <div class="stat"><b>PBR</b><span>材質目標</span></div>
+          <div class="stat"><b>4-layer</b><span>照明設計</span></div>
+          <div class="stat"><b>CC0</b><span>首批資產</span></div>
+        </div>
+        <p class="muted" style="line-height:1.65;margin-top:16px">這個頁面把「高質感建案效果」與「可操作即時 3D」放在同一個測試入口。效果視覺作為藝術方向，3D 場景則持續替換成更高品質模型、材質與燈光。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="gallery">
+    <div class="tile"><img src="./assets/base001/01-exterior.jpg"><div class="label">外觀總覽 · 夜景</div></div>
+    <div class="tile"><img src="./assets/base001/02-living-room.jpg"><div class="label">客廳 · Earth View</div></div>
+    <div class="tile"><img src="./assets/base001/01-exterior.jpg" style="object-position:20% 50%"><div class="label">入口 · 庭園軸線</div></div>
+    <div class="tile"><img src="./assets/base001/01-exterior.jpg" style="object-position:80% 50%"><div class="label">建築 · 水景 · 露台</div></div>
+  </section>
+</div>
+<script>
+const exterior=document.getElementById('exteriorView'),live=document.getElementById('liveView');
+const a=document.getElementById('showExterior'),b=document.getElementById('showLive');
+function showLive(){exterior.classList.add('modehide');live.classList.remove('modehide');a.classList.remove('active');b.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+function showExt(){live.classList.add('modehide');exterior.classList.remove('modehide');b.classList.remove('active');a.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+a.onclick=showExt;b.onclick=showLive;document.getElementById('heroLive').onclick=showLive;
+</script>
+</body>
+</html>
