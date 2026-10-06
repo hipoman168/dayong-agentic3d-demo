@@ -434,6 +434,50 @@ addBox(-10.2,1.0,17.0,1.4,2.0,.5,charcoal,scene);
 const pathMat=new THREE.MeshStandardMaterial({color:0x888b90,roughness:.98});
 for(let i=0;i<15;i++){const z=39-i*1.45;box(0,lunarY(0,z)+.08,z,4.2,.12,1.05,pathMat)}
 
+// --- Estate boundary v2.4: low stone wall + timber screen + gated arrival ---
+const estateWallMat=new THREE.MeshStandardMaterial({color:0x45413c,roughness:.94});
+const estateCapMat=new THREE.MeshStandardMaterial({color:0x756d63,roughness:.76});
+const estateWood=new THREE.MeshStandardMaterial({color:0x5a3928,roughness:.68});
+const estateBronze=new THREE.MeshStandardMaterial({color:0x6e5237,roughness:.34,metalness:.58});
+function wallSeg(x,z,w,d,rot=0){
+  const g=new THREE.Group();scene.add(g);g.position.set(x,lunarY(x,z),z);g.rotation.y=rot;
+  box(0,.58,0,w,1.15,d,estateWallMat,g);
+  box(0,1.18,0,w+.08,.08,d+.08,estateCapMat,g);
+  return g;
+}
+function timberScreen(x,z,len,rot=0){
+  const g=new THREE.Group();scene.add(g);g.position.set(x,lunarY(x,z),z);g.rotation.y=rot;
+  for(let q=-len/2;q<=len/2;q+=.42) box(q,1.92,0,.11,1.55,.18,estateWood,g);
+  box(0,1.25,0,len,.10,.22,estateBronze,g);
+  box(0,2.68,0,len,.10,.22,estateBronze,g);
+}
+// perimeter with a centered front-gate opening
+wallSeg(-17.0,45.0,12.0,.52); wallSeg(17.0,45.0,12.0,.52);
+timberScreen(-17.0,45.0,10.8,0); timberScreen(17.0,45.0,10.8,0);
+wallSeg(-23.0,25.0,40.0,.52,Math.PI/2); timberScreen(-23.0,25.0,38.0,Math.PI/2);
+wallSeg(23.0,25.0,40.0,.52,Math.PI/2); timberScreen(23.0,25.0,38.0,Math.PI/2);
+wallSeg(0,5.0,46.0,.52,0); timberScreen(0,5.0,43.5,0);
+
+// address monoliths and entrance lighting
+box(-5.4,lunarY(-5.4,44.3)+1.55,44.3,1.05,3.0,1.05,stoneDark);
+box(5.4,lunarY(5.4,44.3)+1.55,44.3,1.05,3.0,1.05,stoneDark);
+box(-5.4,lunarY(-5.4,44.3)+2.55,43.72,.62,.11,.06,warmLine);
+box(5.4,lunarY(5.4,44.3)+2.55,43.72,.62,.11,.06,warmLine);
+
+// landscape buffers inside boundary to reduce barren visual field
+for(const [x,z,sc] of [[-20,39,.7],[20,38,.75],[-20,30,.62],[20,29,.68],[-20,17,.72],[20,15,.65],[-18,8,.62],[18,8,.65]]){
+  const yy=lunarY(x,z);
+  cyl(x,yy+1.6,z,.18,.34,3.2,trunkMat);
+  sphere(x,yy+3.25,z,1.05*sc,greenMat);
+  sphere(x-.65*sc,yy+3.05,z+.15,.72*sc,greenMat);
+  sphere(x+.62*sc,yy+3.1,z-.1,.68*sc,greenMat);
+}
+
+// formal arrival court and car forecourt
+const courtMat=new THREE.MeshStandardMaterial({color:0x5a5753,roughness:.86});
+box(-11,lunarY(-11,19)+.11,19,12.5,.16,10.0,courtMat);
+for(let zz=14.8;zz<=23.2;zz+=2.1) box(-11,lunarY(-11,zz)+.205,zz,11.2,.035,.05,warmLine);
+
 // --- Dream Garden: moon pond, arched bridge, sakura, supercars, service staff ---
 const gardenStone=new THREE.MeshStandardMaterial({color:0x73706a,roughness:.98});
 const lanternMat=new THREE.MeshStandardMaterial({color:0xffd59a,emissive:0xff9b46,emissiveIntensity:2.8,roughness:.38});
@@ -539,11 +583,11 @@ function goView(name){
   presentationMode='walk';setRoofVisible(true);
   const views={
     gate:{p:new THREE.Vector3(0,lunarY(0,54)+2.1,54),t:new THREE.Vector3(0,3.4,44),s:'城門入口'},
-    house:{p:new THREE.Vector3(14,lunarY(14,43)+7.8,43),t:new THREE.Vector3(-1,lunarY(0,16)+3.7,16),s:'Earth View House 高級外觀總覽'},
+    house:{p:new THREE.Vector3(14,lunarY(14,43)+7.8,43),t:new THREE.Vector3(-1,lunarY(0,16)+3.7,16),s:'示範豪宅 001｜圍界、前庭與高級外觀'},
     living:{p:new THREE.Vector3(-1.3,lunarY(-1.3,20.4)+1.9,20.4),t:new THREE.Vector3(-2.8,lunarY(0,16)+1.2,17.0),s:'一樓豪華客廳'},
     dining:{p:new THREE.Vector3(4.2,lunarY(4.2,18.8)+1.8,18.8),t:new THREE.Vector3(2.6,lunarY(0,16)+1.1,13.5),s:'餐廳與中島廚房'},
     bedroom:{p:new THREE.Vector3(-1.2,lunarY(-1.2,20.0)+4.85,20.0),t:new THREE.Vector3(-3.0,lunarY(0,16)+4.25,16.5),s:'二樓主人套房'},
-    garden:{p:new THREE.Vector3(8,lunarY(8,33)+3.0,33),t:new THREE.Vector3(14,lunarY(14,20)+1.2,20),s:'月球日式庭園與水景'},
+    garden:{p:new THREE.Vector3(8,lunarY(8,33)+3.0,33),t:new THREE.Vector3(14,lunarY(14,20)+1.2,20),s:'月球景觀庭院｜圍界、水景與植栽'},
     cars:{p:new THREE.Vector3(-6,lunarY(-6,27)+2.8,27),t:new THREE.Vector3(-14,lunarY(-14,14)+.8,14),s:'私人超跑收藏區'},
     upper:{p:new THREE.Vector3(1.8,lunarY(1.8,20.0)+5.05,20.0),t:new THREE.Vector3(-2.0,lunarY(0,16)+4.7,13.2),s:'二樓私人空間'},
     earth:{p:new THREE.Vector3(1,lunarY(1,29)+2.3,29),t:earth.position.clone(),s:'戶外地球景觀台'}
