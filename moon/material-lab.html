@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>New Moon World | Material Lab v01</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050608;color:#eef2f7;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#c{width:100%;height:100%;touch-action:none;display:block}
+.ui{position:fixed;left:16px;top:16px;z-index:10;background:rgba(6,8,11,.78);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:14px 16px;max-width:360px;box-shadow:0 10px 35px rgba(0,0,0,.28)}
+.ui h1{font-size:17px;margin:0 0 6px}.ui p{font-size:12px;line-height:1.55;margin:3px 0;color:#bcc6d3}
+.badge{display:inline-block;font-size:11px;padding:4px 8px;border-radius:999px;background:#1d2530;margin:7px 6px 0 0}
+.controls{position:fixed;right:16px;top:16px;z-index:10;display:grid;gap:8px}
+button{border:1px solid rgba(255,255,255,.16);background:rgba(11,14,18,.82);color:white;border-radius:12px;padding:10px 12px;font-size:12px;cursor:pointer}
+button:hover{background:#202834}
+.legend{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(6,8,11,.72);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:8px 12px;font-size:11px;color:#c7d0db;white-space:nowrap}
+@media(max-width:700px){.ui{max-width:72vw}.legend{font-size:10px}.controls{top:auto;bottom:54px}}
+</style>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="ui">
+  <h1>NMW Material Lab v01</h1>
+  <p>月壤／隕石坑真實感測試。重點觀察坑緣隆起、內壁坡度、微地形、碎石、粗糙度與低角度月光。</p>
+  <span class="badge">Babylon.js</span><span class="badge">Procedural PBR</span><span class="badge">Crater LOD PoC</span>
+</div>
+<div class="controls">
+  <button id="btnLight">切換日照角度</button>
+  <button id="btnDust">切換細節強度</button>
+  <button id="btnWire">線框檢查</button>
+  <button id="btnReset">重置鏡頭</button>
+</div>
+<div class="legend">拖曳旋轉 · 滾輪縮放 · 這是 Material Engine PoC，尚非最終正式月面</div>
+<script>
+const canvas=document.getElementById('c');
+const engine=new BABYLON.Engine(canvas,true,{preserveDrawingBuffer:true,stencil:true,antialias:true});
+const scene=new BABYLON.Scene(engine);
+scene.clearColor=new BABYLON.Color4(0.012,0.015,0.022,1);
+scene.environmentIntensity=.42;
+
+const camera=new BABYLON.ArcRotateCamera('cam',-Math.PI/2.35,1.05,78,new BABYLON.Vector3(0,-1,0),scene);
+camera.attachControl(canvas,true);
+camera.lowerRadiusLimit=22; camera.upperRadiusLimit=150;
+camera.lowerBetaLimit=.30; camera.upperBetaLimit=1.48;
+camera.wheelDeltaPercentage=.018;
+camera.panningSensibility=70;
+
+const hemi=new BABYLON.HemisphericLight('fill',new BABYLON.Vector3(0,1,0),scene);
+hemi.intensity=.16; hemi.diffuse=new BABYLON.Color3(.52,.56,.62); hemi.groundColor=new BABYLON.Color3(.02,.02,.025);
+const sun=new BABYLON.DirectionalLight('sun',new BABYLON.Vector3(-.78,-.34,.48),scene);
+sun.position=new BABYLON.Vector3(55,72,-48); sun.intensity=4.0;
+sun.diffuse=new BABYLON.Color3(1,.965,.91);
+
+const shadow=new BABYLON.ShadowGenerator(2048,sun);
+shadow.usePercentageCloserFiltering=true;
+shadow.filteringQuality=BABYLON.ShadowGenerator.QUALITY_HIGH;
+shadow.bias=.0007;
+
+function hash(x,z){
+  const s=Math.sin(x*127.1+z*311.7)*43758.5453123;
+  return s-Math.floor(s);
+}
+function smooth(t){return t*t*(3-2*t)}
+function noise(x,z){
+  const xi=Math.floor(x), zi=Math.floor(z), xf=x-xi, zf=z-zi;
+  const a=hash(xi,zi), b=hash(xi+1,zi), c=hash(xi,zi+1), d=hash(xi+1,zi+1);
+  const u=smooth(xf),v=smooth(zf);
+  return (a*(1-u)+b*u)*(1-v)+(c*(1-u)+d*u)*v;
+}
+function fbm(x,z){
+  let v=0,a=.5,f=.08;
+  for(let i=0;i<5;i++){v+=a*noise(x*f,z*f);f*=2.05;a*=.5}
+  return v;
+}
+const craters=[
+  {x:-9,z:-4,r:12,d:4.8},
+  {x:18,z:11,r:8,d:3.0},
+  {x:5,z:-24,r:5.6,d:2.0},
+  {x:-26,z:20,r:4.8,d:1.7},
+  {x:30,z:-18,r:3.6,d:1.2},
+  {x:-18,z:-27,r:2.8,d:.9}
+];
+function craterHeight(x,z,c){
+  const dx=x-c.x,dz=z-c.z,r=Math.hypot(dx,dz)/c.r;
+  if(r>1.55) return 0;
+  const bowl=r<1 ? -c.d*Math.pow(1-r*r,2.15) : 0;
+  const rim=c.d*.42*Math.exp(-Math.pow((r-1.03)/.16,2));
+  const ejecta=r>1 ? c.d*.08*Math.exp(-(r-1)*2.6)*(noise(x*.45,z*.45)-.35) : 0;
+  return bowl+rim+ejecta;
+}
+let detailAmp=1;
+function terrainHeight(x,z){
+  let h=(fbm(x,z)-.5)*2.0*detailAmp;
+  h+=(fbm(x*2.4,z*2.4)-.5)*.65*detailAmp;
+  for(const c of craters)h+=craterHeight(x,z,c);
+  h+=.006*(x+z);
+  return h;
+}
+
+const ground=BABYLON.MeshBuilder.CreateGround('lunar',{width:115,height:115,subdivisions:220,updatable:true},scene);
+const pos=ground.getVerticesData(BABYLON.VertexBuffer.PositionKind);
+const inds=ground.getIndices();
+for(let i=0;i<pos.length;i+=3)pos[i+1]=terrainHeight(pos[i],pos[i+2]);
+ground.updateVerticesData(BABYLON.VertexBuffer.PositionKind,pos);
+const normals=[]; BABYLON.VertexData.ComputeNormals(pos,inds,normals);
+ground.updateVerticesData(BABYLON.VertexBuffer.NormalKind,normals);
+ground.receiveShadows=true;
+
+const mat=new BABYLON.PBRMaterial('lunarPBR',scene);
+mat.albedoColor=new BABYLON.Color3(.30,.30,.305);
+mat.metallic=0;
+mat.roughness=.91;
+mat.microSurface=.22;
+mat.environmentIntensity=.22;
+mat.usePhysicalLightFalloff=true;
+ground.material=mat;
+
+const rockMat=new BABYLON.PBRMaterial('rockMat',scene);
+rockMat.albedoColor=new BABYLON.Color3(.24,.245,.255);
+rockMat.roughness=.96; rockMat.metallic=0;
+
+const rocks=[];
+function addRock(x,z,s,ry){
+  const y=terrainHeight(x,z);
+  const m=BABYLON.MeshBuilder.CreatePolyhedron('r',{type:2,size:s},scene);
+  m.position.set(x,y+s*.28,z); m.scaling.y=.45+hash(x,z)*.55; m.rotation.y=ry;
+  m.material=rockMat; shadow.addShadowCaster(m); rocks.push(m);
+}
+for(let i=0;i<155;i++){
+  const x=(hash(i,11)-.5)*108,z=(hash(i,29)-.5)*108;
+  let near=false;
+  for(const c of craters){const rr=Math.hypot(x-c.x,z-c.z); if(rr>c.r*.85&&rr<c.r*1.55)near=true}
+  const s=(near?1.0:.48)+hash(i,47)*(near?1.8:.9);
+  addRock(x,z,s,hash(i,61)*Math.PI);
+}
+
+const stars=BABYLON.MeshBuilder.CreateSphere('sky',{diameter:520,segments:16},scene);
+const skyMat=new BABYLON.StandardMaterial('skyMat',scene);
+skyMat.backFaceCulling=false; skyMat.disableLighting=true; skyMat.emissiveColor=new BABYLON.Color3(.006,.008,.014);
+stars.material=skyMat;
+
+const earth=BABYLON.MeshBuilder.CreateSphere('earth',{diameter:9,segments:48},scene);
+earth.position=new BABYLON.Vector3(-72,44,95);
+const earthMat=new BABYLON.PBRMaterial('earthMat',scene);
+earthMat.albedoColor=new BABYLON.Color3(.07,.24,.42);
+earthMat.emissiveColor=new BABYLON.Color3(.015,.05,.10);
+earthMat.metallic=.05; earthMat.roughness=.55; earth.material=earthMat;
+
+const glow=new BABYLON.GlowLayer('glow',scene); glow.intensity=.25;
+
+const pp=new BABYLON.ImageProcessingConfiguration();
+scene.imageProcessingConfiguration=pp;
+pp.toneMappingEnabled=true; pp.toneMappingType=BABYLON.ImageProcessingConfiguration.TONEMAPPING_ACES;
+pp.exposure=1.15; pp.contrast=1.18;
+
+let lightMode=0,wire=false;
+document.getElementById('btnLight').onclick=()=>{
+  lightMode=(lightMode+1)%3;
+  const dirs=[[-.78,-.34,.48],[-.40,-.16,.90],[.75,-.28,-.60]];
+  const d=dirs[lightMode]; sun.direction=new BABYLON.Vector3(...d);
+};
+document.getElementById('btnDust').onclick=()=>{
+  detailAmp=detailAmp===1?1.65:.72;
+  for(let i=0;i<pos.length;i+=3)pos[i+1]=terrainHeight(pos[i],pos[i+2]);
+  ground.updateVerticesData(BABYLON.VertexBuffer.PositionKind,pos);
+  const nn=[];BABYLON.VertexData.ComputeNormals(pos,inds,nn);
+  ground.updateVerticesData(BABYLON.VertexBuffer.NormalKind,nn);
+};
+document.getElementById('btnWire').onclick=()=>{wire=!wire;mat.wireframe=wire;rockMat.wireframe=wire};
+document.getElementById('btnReset').onclick=()=>{camera.alpha=-Math.PI/2.35;camera.beta=1.05;camera.radius=78;camera.target.set(0,-1,0)};
+
+engine.runRenderLoop(()=>scene.render());
+addEventListener('resize',()=>engine.resize());
+</script>
+</body>
+</html>
