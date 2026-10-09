@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>New Moon World｜總設計整合測試 v01</title>
+<style>
+:root{--bg:#05070b;--panel:rgba(8,12,18,.82);--line:rgba(255,255,255,.14);--gold:#dfbd7a;--muted:#aeb9c8}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.stage{position:absolute;inset:0}.stage iframe{width:100%;height:100%;border:0;background:#03050a}
+.top{position:fixed;left:12px;right:12px;top:12px;z-index:20;display:flex;gap:10px;align-items:flex-start;justify-content:space-between;pointer-events:none}
+.brand{pointer-events:auto;background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;padding:12px 14px;max-width:390px;box-shadow:0 14px 35px rgba(0,0,0,.3)}
+.brand b{display:block;font-size:16px;letter-spacing:.02em}.brand small{display:block;color:var(--muted);font-size:11px;line-height:1.55;margin-top:5px}
+.brand .tag{display:inline-block;margin-top:7px;margin-right:5px;border:1px solid rgba(223,189,122,.35);color:#f0d8aa;border-radius:999px;padding:4px 7px;font-size:10px}
+.nav{pointer-events:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;max-width:55vw}
+.nav button{border:1px solid var(--line);background:rgba(8,12,18,.86);backdrop-filter:blur(12px);color:#edf2f8;border-radius:12px;padding:10px 12px;font-size:11px;min-height:40px}
+.nav button.active{background:linear-gradient(135deg,#d7b36f,#96703b);color:#17120b;border-color:transparent;font-weight:800}
+.doctrine{position:fixed;left:12px;bottom:12px;z-index:20;background:rgba(8,12,18,.78);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:14px;padding:10px 12px;max-width:min(520px,72vw);pointer-events:none}
+.doctrine b{font-size:11px;color:#f1d59f}.doctrine span{display:block;font-size:10px;color:#b7c1cd;line-height:1.45;margin-top:3px}
+.mode{display:none}.mode.active{display:block}
+.hero{position:absolute;inset:0;background:#05080d}.hero img{width:100%;height:100%;object-fit:cover;filter:saturate(.92) contrast(1.05) brightness(.84)}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,6,10,.76),rgba(3,6,10,.05) 52%),linear-gradient(0deg,rgba(3,6,10,.72),transparent 48%)}
+.heroCopy{position:absolute;z-index:3;left:6vw;top:22vh;width:min(620px,82vw)}
+.heroCopy .eyebrow{font-size:11px;letter-spacing:.3em;color:#edcf94;margin-bottom:14px}.heroCopy h1{font-family:Georgia,"Times New Roman",serif;font-weight:500;font-size:clamp(42px,7vw,86px);line-height:.96;margin:0 0 18px}.heroCopy p{font-size:14px;line-height:1.75;color:#d7e0ea;max-width:570px}
+.pills{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px}.pills span{font-size:10px;padding:7px 9px;border-radius:9px;background:rgba(10,15,22,.62);border:1px solid rgba(223,189,122,.3);color:#efd7aa}
+.transport{position:absolute;right:4vw;bottom:8vh;z-index:4;width:min(390px,84vw);padding:14px 16px;background:rgba(8,12,18,.72);border:1px solid var(--line);border-radius:16px;backdrop-filter:blur(12px)}
+.transport b{font-size:12px;color:#f0d39a}.transport p{font-size:10.5px;line-height:1.55;color:#b9c4d0;margin:5px 0 0}
+@media(max-width:760px){.top{align-items:stretch;flex-direction:column}.brand{max-width:74vw}.nav{max-width:100%;justify-content:flex-start}.nav button{padding:8px 9px;min-height:36px}.heroCopy{left:20px;top:30vh}.heroCopy p{font-size:12px}.transport{bottom:66px;right:12px}.doctrine{max-width:92vw}.doctrine span{display:none}}
+</style>
+</head>
+<body>
+<div id="hero" class="stage mode active">
+  <div class="hero">
+    <img src="./assets/base001/01-exterior.jpg" alt="New Moon World"/>
+    <div class="heroCopy">
+      <div class="eyebrow">NEW MOON WORLD · DESIGN INTEGRATION v01</div>
+      <h1>星際高端<br/>住宅文明</h1>
+      <p>不是大眾殖民地，也不是人海型 MMO。以稀缺、精緻、身份、品味與生活品質為核心，讓月球荒原與高端文明形成強烈但克制的反差。</p>
+      <div class="pills"><span>Low-Density</span><span>High-Fidelity</span><span>Earth View</span><span>PBR Material</span><span>Premium Service</span><span>Private Spacecraft</span></div>
+    </div>
+    <div class="transport"><b>交通方向｜Spacecraft-first</b><p>住宅區內低密度步行；跨區採公共接駁飛船；高端住戶配置私人飛船；後勤使用無人物流與維修飛船。正式 3D 航道與起降坪將在下一版焊入同一 Scene。</p></div>
+  </div>
+</div>
+<div id="world" class="stage mode"><iframe src="./base-001-3d.html?v=27" title="New Moon World live 3D"></iframe></div>
+<div id="material" class="stage mode"><iframe src="./material-lab.html?v=2" title="New Moon World material lab"></iframe></div>
+<div id="residence" class="stage mode"><iframe src="./showroom-v2.html?v=2" title="New Moon World residence"></iframe></div>
+
+<div class="top">
+  <div class="brand">
+    <b>New Moon World｜總設計整合測試 v01</b>
+    <small>總設計中心整合入口。先看整體氣質，再分別檢查即時 3D、月面材質與住宅品質。</small>
+    <span class="tag">稀缺</span><span class="tag">精緻</span><span class="tag">身份</span><span class="tag">品味</span>
+  </div>
+  <div class="nav">
+    <button class="active" data-mode="hero">整體氣質</button>
+    <button data-mode="world">進入 3D 世界</button>
+    <button data-mode="material">月面材質 v02</button>
+    <button data-mode="residence">住宅效果</button>
+  </div>
+</div>
+<div class="doctrine"><b>Design Constitution v01</b><span>有錢但有品味、前衛但不浮誇、稀有但不俗氣、有身份但不張揚。任何子系統偏離此定位，總設計中心直接退回。</span></div>
+<script>
+const modes=[...document.querySelectorAll('.mode')],btns=[...document.querySelectorAll('[data-mode]')];
+function setMode(id){modes.forEach(x=>x.classList.toggle('active',x.id===id));btns.forEach(x=>x.classList.toggle('active',x.dataset.mode===id))}
+btns.forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+</script>
+</body>
+</html>
