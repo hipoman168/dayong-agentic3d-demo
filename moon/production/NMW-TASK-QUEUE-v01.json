@@ -1,0 +1,265 @@
+{
+  "project": "New Moon World",
+  "version": "NMW-TASK-QUEUE-v01",
+  "director": "ChatGPT 總設計中心",
+  "reviewer": "D1 / DeepSeek",
+  "rule": "No Evidence, No PASS",
+  "slice": "VERTICAL-SLICE-001",
+  "tasks": [
+    {
+      "id": "NMW-VS001-EXP-001",
+      "team": "遊戲人物・互動體驗設計中心",
+      "title": "Login + Spawn + Third-Person Controller + Camera",
+      "scene_ids": [
+        "S000",
+        "S010",
+        "S020"
+      ],
+      "status": "PENDING",
+      "depends_on": [],
+      "deliverables": [
+        "login flow",
+        "avatar spawn",
+        "third-person controller",
+        "camera follow/collision",
+        "Idle/Walk/Run/Turn/Stop state machine",
+        "desktop/mobile input map"
+      ],
+      "gate": [
+        "actual avatar movement",
+        "collision works",
+        "animation transitions visible",
+        "commit+playable evidence"
+      ]
+    },
+    {
+      "id": "NMW-VS001-CITY-001",
+      "team": "城市規劃中心",
+      "title": "Welcome District + Walk Route + Landing Court + Flight Corridor",
+      "scene_ids": [
+        "S010",
+        "S020",
+        "S030",
+        "S050"
+      ],
+      "status": "PENDING",
+      "depends_on": [],
+      "deliverables": [
+        "welcome district layout",
+        "walkable route",
+        "landing court",
+        "flight corridor",
+        "streaming boundaries",
+        "Earth View corridor"
+      ],
+      "gate": [
+        "persistent IDs",
+        "traversable route",
+        "low-density premium layout"
+      ]
+    },
+    {
+      "id": "NMW-VS001-ARCH-001",
+      "team": "建築外觀設計中心",
+      "title": "Welcome Pavilion + Estate Residence Exterior",
+      "scene_ids": [
+        "S010",
+        "S060",
+        "S080"
+      ],
+      "status": "PENDING",
+      "depends_on": [
+        "NMW-VS001-CITY-001"
+      ],
+      "deliverables": [
+        "game-ready GLB/glTF",
+        "entrance/door anchors",
+        "landing-pad integration",
+        "collision proxies",
+        "LOD0/1/2",
+        "material IDs",
+        "interior portals"
+      ],
+      "gate": [
+        "no hero primitives",
+        "close-up quality",
+        "runtime load PASS"
+      ]
+    },
+    {
+      "id": "NMW-VS001-LAND-001",
+      "team": "庭園景觀設計中心",
+      "title": "Estate Garden Approach + Earth View Sequence",
+      "scene_ids": [
+        "S070"
+      ],
+      "status": "PENDING",
+      "depends_on": [
+        "NMW-VS001-CITY-001",
+        "NMW-VS001-ARCH-001"
+      ],
+      "deliverables": [
+        "garden route",
+        "water/plant/rock assets",
+        "path lighting",
+        "Earth View framing",
+        "walkable nav surface",
+        "fireworks extension point"
+      ],
+      "gate": [
+        "player traversable",
+        "game-ready scene",
+        "premium residential language"
+      ]
+    },
+    {
+      "id": "NMW-VS001-INT-001",
+      "team": "室內裝修設計中心",
+      "title": "Living + Dining + Master Suite",
+      "scene_ids": [
+        "S090",
+        "S100"
+      ],
+      "status": "PENDING",
+      "depends_on": [
+        "NMW-VS001-ARCH-001"
+      ],
+      "deliverables": [
+        "room GLB scenes",
+        "furniture",
+        "sit/inspect anchors",
+        "Day/Evening/Rest/Earth View lighting presets",
+        "collision/nav surfaces",
+        "room IDs"
+      ],
+      "gate": [
+        "player can enter/walk",
+        "real 3D furniture",
+        "interaction anchors present"
+      ]
+    },
+    {
+      "id": "NMW-VS001-ASSET-001",
+      "team": "3D資產・材質資產中心",
+      "title": "Common Game-Ready Asset Pipeline",
+      "scene_ids": [
+        "ALL"
+      ],
+      "status": "PENDING",
+      "depends_on": [],
+      "deliverables": [
+        "GLB export standard",
+        "PBR maps",
+        "collision standard",
+        "LOD standard",
+        "Persistent Asset ID",
+        "asset manifest",
+        "spacecraft asset",
+        "concierge character base"
+      ],
+      "gate": [
+        "runtime loadable",
+        "no missing textures",
+        "poly/texture budgets recorded"
+      ]
+    },
+    {
+      "id": "NMW-VS001-NPC-001",
+      "team": "AI Agent / NPC 行為中心",
+      "title": "Concierge + Service NPC + Interaction Hooks",
+      "scene_ids": [
+        "S010",
+        "S060",
+        "S090"
+      ],
+      "status": "PENDING",
+      "depends_on": [
+        "NMW-VS001-EXP-001",
+        "NMW-VS001-ASSET-001"
+      ],
+      "deliverables": [
+        "greeting state",
+        "guidance behavior",
+        "arrival service behavior",
+        "talk interaction",
+        "permission-aware home access hook",
+        "merchant hook"
+      ],
+      "gate": [
+        "stateful behavior",
+        "nav+interaction IDs mapped",
+        "runtime evidence"
+      ]
+    },
+    {
+      "id": "NMW-VS001-INTEGRATE-001",
+      "team": "總設計整合 / Runtime Integration",
+      "title": "Assemble First Playable Journey",
+      "scene_ids": [
+        "S000",
+        "S010",
+        "S020",
+        "S030",
+        "S040",
+        "S050",
+        "S060",
+        "S070",
+        "S080",
+        "S090",
+        "S100"
+      ],
+      "status": "BLOCKED",
+      "depends_on": [
+        "NMW-VS001-EXP-001",
+        "NMW-VS001-CITY-001",
+        "NMW-VS001-ARCH-001",
+        "NMW-VS001-LAND-001",
+        "NMW-VS001-INT-001",
+        "NMW-VS001-ASSET-001",
+        "NMW-VS001-NPC-001"
+      ],
+      "deliverables": [
+        "runtime assembly",
+        "Babylon vs PlayCanvas validation",
+        "scene graph",
+        "interaction registry",
+        "streaming",
+        "save/load",
+        "mobile profile",
+        "QA evidence"
+      ],
+      "gate": [
+        "single playable URL",
+        "S000-S100 complete",
+        "FPS/loading/memory measured",
+        "Evidence Freeze"
+      ]
+    },
+    {
+      "id": "NMW-VS001-D1-REVIEW",
+      "team": "D1 / DeepSeek",
+      "title": "Design Constitution Review",
+      "scene_ids": [
+        "ALL"
+      ],
+      "status": "BLOCKED",
+      "depends_on": [
+        "NMW-VS001-INTEGRATE-001"
+      ],
+      "deliverables": [
+        "PASS/REJECT",
+        "blocking issues",
+        "revision priority",
+        "evidence references"
+      ],
+      "gate": [
+        "稀缺感",
+        "精緻度",
+        "身份辨識",
+        "審美一致性",
+        "生活品質",
+        "not generic 3D demo"
+      ]
+    }
+  ]
+}
