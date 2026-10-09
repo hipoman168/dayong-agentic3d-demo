@@ -1,0 +1,33 @@
+name: NMW Temporary Transfer
+on:
+  workflow_dispatch:
+    inputs:
+      asset_url:
+        description: "Public or encrypted GitHub release asset URL"
+        required: true
+      output_name:
+        description: "Artifact name"
+        required: true
+permissions:
+  contents: read
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download staged archive
+        run: |
+          set -euo pipefail
+          curl -L --fail --retry 5 "$ASSET_URL" -o payload.bin
+          ls -lh payload.bin
+          sha256sum payload.bin | tee payload.sha256
+        env:
+          ASSET_URL: ${{ inputs.asset_url }}
+      - name: Upload transfer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.output_name }}
+          path: |
+            payload.bin
+            payload.sha256
+          compression-level: 0
+          retention-days: 1
