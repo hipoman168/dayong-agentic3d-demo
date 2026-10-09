@@ -32,9 +32,10 @@ canvas{display:block}
 <div id="blockout">ENVIRONMENT = BLOCKOUT · NOT VISUAL PASS</div>
 
 <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
-import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/+esm';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js/+esm';
 
+window.addEventListener('error',e=>{const s=document.getElementById('status'); if(s)s.textContent='JS ERROR：'+e.message;});
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x050b14);
 scene.fog=new THREE.FogExp2(0x07111c,.018);
