@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>New Moon World｜Integrated World v03</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#03060b;color:#f5efe5;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+canvas{display:block}
+#hud{position:fixed;left:12px;top:12px;z-index:20;max-width:420px;background:rgba(6,11,18,.78);border:1px solid rgba(216,184,120,.45);backdrop-filter:blur(12px);padding:12px 14px;border-radius:15px;box-shadow:0 15px 45px #0008;pointer-events:none}
+#hud b{display:block;font-size:16px;color:#f2d49b;margin-bottom:5px}#hud small{display:block;color:#c8d0dc;font-size:11px;line-height:1.45}
+#status{margin-top:7px;color:#9ee3c1;font-size:11px}
+#panel{position:fixed;right:12px;top:12px;z-index:21;display:grid;grid-template-columns:repeat(2,minmax(94px,1fr));gap:7px;max-width:310px}
+button{border:1px solid rgba(220,190,132,.42);background:rgba(9,15,24,.86);color:#f2e8d5;border-radius:11px;padding:9px 10px;font-size:11px;min-height:40px;backdrop-filter:blur(10px)}
+button.active{background:linear-gradient(135deg,#c9a66b,#79603b);color:#15110b;font-weight:800}
+#legend{position:fixed;left:12px;bottom:12px;z-index:20;background:rgba(6,11,18,.74);border:1px solid rgba(255,255,255,.11);backdrop-filter:blur(10px);padding:9px 11px;border-radius:12px;color:#b9c4d1;font-size:10px;max-width:520px}
+#badge{display:inline-block;color:#efd39d;border:1px solid rgba(220,190,132,.35);padding:3px 6px;border-radius:999px;margin-right:4px}
+@media(max-width:720px){#hud{max-width:72vw}#hud small{font-size:10px}#panel{top:auto;bottom:58px;left:10px;right:10px;max-width:none;grid-template-columns:repeat(4,1fr)}button{font-size:10px;padding:7px 4px}#legend{max-width:90vw}}
+</style>
+</head>
+<body>
+<div id="hud"><b>NEW MOON WORLD｜Integrated World v03</b>
+<small>總設計中心最新整合：高端星際住宅文明 · 建築外觀 · 室內裝修 · 庭園景觀 · 城市分區 · 飛船交通 · 服務人員</small>
+<div id="status">正在建立新版世界…</div></div>
+<div id="panel">
+<button data-view="city" class="active">城市總覽</button>
+<button data-view="estate">私人莊園</button>
+<button data-view="facade">建築外觀</button>
+<button data-view="garden">外牆庭園</button>
+<button data-view="living">豪華客廳</button>
+<button data-view="dining">景觀餐廳</button>
+<button data-view="bedroom">主人套房</button>
+<button data-view="spaceport">私人飛船</button>
+</div>
+<div id="legend"><span id="badge">Low-Density · High-Fidelity</span> 拖曳旋轉 · 滾輪縮放。這是全新 3D 整合頁，不是圖片輪播。</div>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+
+const status=document.getElementById('status');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x03060b);
+scene.fog=new THREE.FogExp2(0x07111b,.0019);
+
+const camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,2200);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.23;
+document.body.prepend(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0x96aed0,0x181516,.65));
+const sun=new THREE.DirectionalLight(0xffe5b8,4.0); sun.position.set(-130,170,90); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-180;sun.shadow.camera.right=180;sun.shadow.camera.top=180;sun.shadow.camera.bottom=-180;scene.add(sun);
+
+const mat=(c,rough=.7,metal=.05)=>new THREE.MeshStandardMaterial({color:c,roughness:rough,metalness:metal});
+const stone=mat(0x55575c,.95,0), regolith=mat(0x66686d,.99,0), dark=mat(0x171c22,.42,.55), warmStone=mat(0x857665,.9,.02);
+const plaster=mat(0xd9d5c9,.9,0), wood=mat(0x6b4630,.72,0), bronze=mat(0x8b6b41,.3,.7), green=mat(0x2f5a43,.88,0);
+const cream=mat(0xe7ddcd,.82,0), textile=mat(0x8c8176,.98,0), blackStone=mat(0x111418,.3,.12);
+const gold=mat(0xb08c4e,.28,.75), pink=mat(0xd991aa,.8,0);
+const glass=new THREE.MeshPhysicalMaterial({color:0x80b3cf,transparent:true,opacity:.34,roughness:.06,metalness:.05,transmission:.28,thickness:.12,ior:1.45});
+const water=new THREE.MeshPhysicalMaterial({color:0x245e72,transparent:true,opacity:.65,roughness:.12,metalness:.04,transmission:.18});
+const glow=new THREE.MeshStandardMaterial({color:0xffd49a,emissive:0xffa343,emissiveIntensity:3.8,roughness:.25});
+const blueGlow=new THREE.MeshStandardMaterial({color:0x87d3ff,emissive:0x3aaeff,emissiveIntensity:5.5,roughness:.18});
+
+function box(x,y,z,w,h,d,m,parent=scene){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function sph(x,y,z,r,m,parent=scene,sx=1,sy=1,sz=1){const o=new THREE.Mesh(new THREE.SphereGeometry(r,28,18),m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;parent.add(o);return o}
+function cyl(x,y,z,r,h,m,parent=scene,seg=28){const o=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg),m);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o}
+function lineGlow(x,y,z,w,d,parent=scene){return box(x,y,z,w,.045,d,glow,parent)}
+function noise(x,z){return Math.sin(x*.073)*1.3+Math.cos(z*.061)*.9+Math.sin((x+z)*.031)*1.7}
+function lunarY(x,z){return noise(x,z)*.55}
+
+const groundGeo=new THREE.PlaneGeometry(1200,1200,150,150);groundGeo.rotateX(-Math.PI/2);
+const gp=groundGeo.attributes.position;for(let i=0;i<gp.count;i++){const x=gp.getX(i),z=gp.getZ(i);gp.setY(i,lunarY(x,z))}groundGeo.computeVertexNormals();
+const ground=new THREE.Mesh(groundGeo,regolith);ground.receiveShadow=true;scene.add(ground);
+
+// crater fields
+for(let i=0;i<95;i++){const a=i*2.399,r=85+Math.sqrt(i)*18,x=Math.cos(a)*r,z=Math.sin(a)*r,y=lunarY(x,z);
+ const rock=new THREE.Mesh(new THREE.IcosahedronGeometry(.7+(i%5)*.38,1),stone);rock.position.set(x,y+.35,z);rock.rotation.set(i*.7,i*.3,i*.2);scene.add(rock);
+}
+
+// stars + Earth
+const starGeo=new THREE.BufferGeometry(),sp=[];for(let i=0;i<1500;i++){const r=650+Math.random()*350,a=Math.random()*Math.PI*2,b=Math.acos(2*Math.random()-1);sp.push(r*Math.sin(b)*Math.cos(a),r*Math.cos(b),r*Math.sin(b)*Math.sin(a))}starGeo.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:.9,sizeAttenuation:false})));
+const earthMat=new THREE.MeshStandardMaterial({color:0x3677ad,roughness:.68,emissive:0x071927,emissiveIntensity:.5});
+sph(-260,160,-350,38,earthMat);
+
+// DISTRICT / CITY LAYER
+const city=new THREE.Group();scene.add(city);
+function tower(x,z,w,h,d,baseMat,accentMat=glass){
+ const y=lunarY(x,z),g=new THREE.Group();g.position.set(x,y,z);city.add(g);
+ box(0,h/2,0,w,h,d,baseMat,g); box(0,h*.58,d/2+.06,w*.82,h*.72,.12,accentMat,g);
+ for(let yy=5;yy<h-3;yy+=6) lineGlow(0,yy,d/2+.14,w*.68,.04,g);
+ return g;
+}
+// low-density residential ring
+for(const [x,z,rot] of [[-125,40,.1],[-95,-45,-.2],[115,50,.4],[105,-55,-.3],[-145,-90,.2],[145,-100,-.15]]){
+ const y=lunarY(x,z),g=new THREE.Group();g.position.set(x,y,z);g.rotation.y=rot;city.add(g);
+ box(0,2.2,0,24,4.4,16,plaster,g);box(-4,5.1,-1,15,5.4,12,dark,g);box(6,3.0,5,11,5.5,.18,glass,g);box(0,8,0,28,.28,19,dark,g);
+ lineGlow(0,1.0,8.2,18,.07,g);
+}
+// commercial skyline — intentionally sparse
+tower(-210,-100,30,86,28,dark);
+tower(-175,-150,24,63,24,warmStone);
+tower(190,-125,35,108,31,dark);
+tower(225,-70,26,72,24,plaster);
+tower(0,-250,42,132,40,dark);
+tower(65,-230,27,81,27,warmStone);
+// central premium boulevard
+for(let z=-170;z<=60;z+=18){box(-58,lunarY(-58,z)+.08,z,5,.14,12,warmStone);box(58,lunarY(58,z)+.08,z,5,.14,12,warmStone)}
+for(let z=-160;z<=55;z+=28){cyl(-50,lunarY(-50,z)+.7,z,.18,1.4,bronze);sph(-50,lunarY(-50,z)+1.7,z,.28,glow);cyl(50,lunarY(50,z)+.7,z,.18,1.4,bronze);sph(50,lunarY(50,z)+1.7,z,.28,glow)}
+
+// ESTATE 001
+const estate=new THREE.Group();estate.position.set(0,lunarY(0,38),38);scene.add(estate);
+// boundary
+for(const x of [-42,42]) box(x,1,0,.55,2,70,warmStone,estate);
+for(const z of [-35,35]) {box(0,1,z,84,2,.55,warmStone,estate);lineGlow(0,2.05,z,74,.06,estate)}
+// entry gate
+box(-7,2,35,3.2,4,1.1,dark,estate);box(7,2,35,3.2,4,1.1,dark,estate);box(0,4.3,35,18,.5,1.25,bronze,estate);
+for(let x=-4.5;x<=4.5;x+=.8) box(x,1.8,35,.12,3.1,.18,dark,estate);
+
+// main residence: EX-01 + EX-02
+const house=new THREE.Group();house.position.set(0,0,-4);estate.add(house);
+box(0,.22,0,44,.44,29,warmStone,house);
+box(-8,3,0,27,5.6,24,plaster,house);box(11,2.8,1,14,5.2,20,dark,house);
+box(-6.5,7.1,-1,25,7,20,dark,house);box(10,6.1,-2,13,5.0,15,plaster,house);
+// deep eaves
+box(-4,11.0,-1,36,.38,26,dark,house);box(10,5.7,3,17,.3,22,bronze,house);
+// Earth-view facade and screens
+box(-5,4.9,12.2,29,8.8,.16,glass,house);
+for(let x=-18;x<=8;x+=2.2) box(x,4.8,12.5,.11,9.2,.32,wood,house);
+box(11,2.8,11.1,13,4.7,.14,glass,house);
+for(let x=6;x<=16;x+=1.0) box(x,2.7,11.45,.10,4.8,.28,bronze,house);
+// entry stone anchor
+box(-19,3.4,7.8,4.5,6.8,9,warmStone,house);lineGlow(-19,5.7,12.4,2.7,.06,house);
+// terrace
+box(-4,.65,16.3,32,.28,7,wood,house);box(-4,1.35,19.4,31,1.2,.08,glass,house);
+
+// INTERIOR — fully visible through facade
+const interior=new THREE.Group();interior.position.set(0,.5,0);house.add(interior);
+// living
+box(-10,.32,4,15,.10,9,textile,interior);
+box(-12,1.0,5,10,.85,2.6,cream,interior);box(-16,1.0,2,2.8,.85,6.5,cream,interior);
+box(-9,1.0,1,4,.24,2.2,blackStone,interior);lineGlow(-9,1.22,1,2.4,.6,interior);
+box(-18,1.25,-7,2.3,.15,8,wood,interior);
+for(let z=-9;z<=-5;z+=2) box(-18,2.0,z,1.9,.08,1.2,gold,interior);
+// dining
+box(7,1.0,2,10,.28,3.2,blackStone,interior);
+for(let x=3.2;x<=10.8;x+=2.5){box(x,.72,.0,1.1,.8,1.1,cream,interior);box(x,.72,4.0,1.1,.8,1.1,cream,interior)}
+box(14,1.3,-5,7,1.5,2.2,blackStone,interior);box(14,2.12,-5,7.4,.12,2.4,gold,interior);
+// bedroom upper
+box(-8,6.4,1,9,.65,5.8,cream,interior);box(-8,7.1,-2.1,9.4,2.7,.35,wood,interior);box(-8,6.85,1,7.7,.2,4.8,textile,interior);
+box(-14,6.1,1,1.4,.8,1.4,blackStone,interior);box(-2,6.1,1,1.4,.8,1.4,blackStone,interior);
+// indirect/task lights
+for(const [x,y,z,w] of [[-10,4.7,-9,15],[7,4.7,-9,12],[-8,9.6,-8,15]])lineGlow(x,y,z,w,.07,interior);
+const il1=new THREE.PointLight(0xffbd7a,5,26,2);il1.position.set(-10,4,4);house.add(il1);
+const il2=new THREE.PointLight(0xffd0a0,4.6,23,2);il2.position.set(7,4,2);house.add(il2);
+const il3=new THREE.PointLight(0xffbd7a,4.2,20,2);il3.position.set(-8,9,1);house.add(il3);
+
+// GARDEN
+const garden=new THREE.Group();estate.add(garden);
+const pond=box(24,.2,4,19,.18,13,water,garden);pond.rotation.y=.08;
+for(const [x,z,r] of [[16,1,1.4],[18,10,1],[31,0,1.7],[33,10,1.1]])sph(x,.5,z,r,warmStone,garden,1.2,.65,1);
+for(const [x,z,s] of [[-28,12,1],[-27,-10,.85],[27,17,1.1],[30,-12,.9],[-31,-20,.75]]){
+ cyl(x,2.2,z,.28,4.4,wood,garden);sph(x,5.0,z,2.4*s,pink,garden,1.15,.8,1);
+}
+for(const [x,z] of [[-22,19],[-11,20],[5,22],[20,22],[32,16]]){cyl(x,.6,z,.18,1.2,dark,garden);sph(x,1.5,z,.42,glow,garden)}
+// bridge
+for(let i=-5;i<=5;i++){const x=24+i*1.25,y=.5+1.6*(1-Math.pow(i/5,2));box(x,y,4,1.35,.20,3.4,wood,garden)}
+
+// SERVICE PEOPLE
+function staff(x,z,rot=0){const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rot;estate.add(g);cyl(0,1.1,0,.32,1.55,dark,g);sph(0,2.15,0,.31,mat(0xd9ac89,.75,0),g);box(-.42,1.25,0,.13,1.0,.15,dark,g);box(.42,1.25,0,.13,1.0,.15,dark,g)}
+staff(-4,29,0);staff(4,29,0);staff(-23,9,.3);
+
+// SPACECRAFT + PAD
+function landingPad(x,z,r=9){const y=.22,g=new THREE.Group();g.position.set(x,y,z);estate.add(g);cyl(0,0,0,r,.32,dark,g,64);const rg=new THREE.Mesh(new THREE.TorusGeometry(r*.82,.11,10,64),blueGlow);rg.rotation.x=Math.PI/2;rg.position.y=.2;g.add(rg);return g}
+function spacecraft(x,z,scale=1){const g=new THREE.Group();g.position.set(x,1.35*scale,z);estate.add(g);const body=sph(0,0,0,1,plaster,g,3.6*scale,.8*scale,1.4*scale);const belly=sph(-.25,-.38,0,1,dark,g,2.8*scale,.46*scale,1.08*scale);sph(.55,.48,0,1,glass,g,1.35*scale,.5*scale,.92*scale);
+ for(const side of [-1,1])box(-.2,-.05,side*1.7*scale,2.8*scale,.14*scale,1.0*scale,dark,g);
+ for(const side of [-.62,.62]){const e=cyl(-2.75*scale,-.05,side*scale,.26*scale,.65*scale,dark,g);e.rotation.z=Math.PI/2;const eg=cyl(-3.08*scale,-.05,side*scale,.19*scale,.08*scale,blueGlow,g);eg.rotation.z=Math.PI/2}
+ return g}
+landingPad(-29,-16,9);spacecraft(-29,-16,1.05);
+
+// orbital shuttle in distance
+const shuttle=new THREE.Group();shuttle.position.set(92,34,-30);scene.add(shuttle);sph(0,0,0,1,plaster,shuttle,5,.95,1.6);sph(1.5,.55,0,1,glass,shuttle,2,.58,1.15);box(-.5,-.1,2.1,3.5,.18,1.2,dark,shuttle);box(-.5,-.1,-2.1,3.5,.18,1.2,dark,shuttle);
+
+// camera views
+let target=new THREE.Vector3(),radius=260,az=.72,el=.38;
+const views={
+ city:{r:360,a:.70,e:.36,t:[0,24,-55],label:'城市總覽｜R1 低密度住宅 + 商業核心 + Earth View 軸線'},
+ estate:{r:112,a:.65,e:.30,t:[0,5,34],label:'私人莊園｜低密度高精緻住宅'},
+ facade:{r:63,a:.25,e:.20,t:[0,5,34],label:'建築外觀｜Japanese Courtyard Modern × Contemporary Luxury'},
+ garden:{r:48,a:-.25,e:.19,t:[18,2,43],label:'外牆庭園｜水景、櫻花、石材、路徑燈與私密邊界'},
+ living:{r:19,a:-.40,e:.10,t:[-10,2,38],label:'豪華客廳｜四層燈光、木石材、Earth View'},
+ dining:{r:18,a:.78,e:.11,t:[7,2,37],label:'景觀餐廳｜長桌、中島、暖色任務照明'},
+ bedroom:{r:18,a:2.3,e:.16,t:[-8,7,37],label:'主人套房｜暖木、織物、低調高級'},
+ spaceport:{r:34,a:-1.25,e:.22,t:[-29,2,22],label:'私人飛船｜住宅級起降坪與低密度航行'}
+};
+function go(k){const v=views[k];radius=v.r;az=v.a;el=v.e;target.set(...v.t);status.textContent=v.label;document.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.view===k))}
+document.querySelectorAll('button').forEach(b=>b.onclick=()=>go(b.dataset.view));
+
+let drag=false,px=0,py=0;
+renderer.domElement.addEventListener('pointerdown',e=>{drag=true;px=e.clientX;py=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
+renderer.domElement.addEventListener('pointerup',()=>drag=false);
+renderer.domElement.addEventListener('pointermove',e=>{if(!drag)return;az-=(e.clientX-px)*.0055;el=Math.max(-.08,Math.min(1.18,el+(e.clientY-py)*.004));px=e.clientX;py=e.clientY});
+renderer.domElement.addEventListener('wheel',e=>{radius=Math.max(8,Math.min(520,radius+e.deltaY*.06))},{passive:true});
+
+function loop(){requestAnimationFrame(loop);camera.position.set(target.x+radius*Math.sin(az)*Math.cos(el),target.y+radius*Math.sin(el),target.z+radius*Math.cos(az)*Math.cos(el));camera.lookAt(target);renderer.render(scene,camera)}
+go('city');loop();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body></html>
