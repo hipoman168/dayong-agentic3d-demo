@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>New Moon World｜Sprint 001 First Playable</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#03070c;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+canvas{display:block}
+#enter{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#15243c 0,#07101d 40%,#020409 100%)}
+#card{width:min(92vw,520px);padding:28px;border:1px solid #b99a62;background:rgba(5,9,15,.86);border-radius:18px;text-align:center;backdrop-filter:blur(12px)}
+#card h1{margin:0 0 10px;color:#efd39c;font-size:25px}#card p{margin:0 0 20px;color:#bdc7d4;line-height:1.6}
+#enterBtn{border:1px solid #d7b676;background:linear-gradient(135deg,#d3b171,#8f6d3d);color:#14100a;padding:13px 24px;border-radius:12px;font-weight:800;font-size:16px}
+#hud{position:fixed;left:12px;top:12px;z-index:20;max-width:380px;background:rgba(5,10,17,.78);border:1px solid rgba(220,187,126,.4);border-radius:13px;padding:10px 12px;backdrop-filter:blur(10px);pointer-events:none}
+#hud b{color:#efd39c}#hud small{display:block;color:#bdc6d3;margin-top:4px;line-height:1.45}#status{margin-top:6px;color:#9cf0c3;font-size:12px}
+#mission{position:fixed;right:12px;top:12px;z-index:20;background:rgba(5,10,17,.76);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 12px;font-size:12px;max-width:260px}
+#mission strong{display:block;color:#ffe1a6;margin-bottom:4px}
+#mobile{position:fixed;left:18px;bottom:20px;z-index:25;width:142px;height:142px;display:none}
+.pad{position:absolute;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,255,255,.28);background:rgba(10,17,27,.62);color:white;font-size:19px}
+#up{left:47px;top:0}#down{left:47px;bottom:0}#left{left:0;top:47px}#right{right:0;top:47px}
+#run{position:fixed;right:20px;bottom:28px;z-index:25;display:none;width:70px;height:70px;border-radius:50%;border:1px solid #c9a867;background:rgba(80,57,28,.72);color:#ffe4b0;font-weight:700}
+#blockout{position:fixed;left:12px;bottom:12px;z-index:20;background:#5e3f18;color:#ffe7b3;padding:5px 8px;border-radius:8px;font-size:10px}
+@media(max-width:800px){#mobile,#run{display:block}#mission{top:auto;bottom:178px;right:10px;max-width:210px}#hud{max-width:70vw;font-size:12px}}
+</style>
+</head>
+<body>
+<div id="enter"><div id="card"><h1>NEW MOON WORLD</h1><p>第一個真正可玩的 Vertical Slice。<br>進入世界後，控制角色走到「私人移動庭院」。</p><button id="enterBtn">ENTER WORLD</button></div></div>
+<div id="hud"><b>SPRINT 001 · FIRST PLAYABLE</b><small>第三人稱角色 / Camera Follow / Idle-Walk-Run / Collision / Destination Trigger</small><div id="status">等待進入世界</div></div>
+<div id="mission"><strong>任務 S020</strong>從迎賓亭步行到前方發光的「Mobility Court」。<br>桌面：WASD / Shift 跑步<br>手機：左下方向鍵 / 右下 RUN</div>
+<div id="mobile"><button class="pad" id="up">▲</button><button class="pad" id="down">▼</button><button class="pad" id="left">◀</button><button class="pad" id="right">▶</button></div>
+<button id="run">RUN</button>
+<div id="blockout">ENVIRONMENT = BLOCKOUT · NOT VISUAL PASS</div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
+import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js';
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x050b14);
+scene.fog=new THREE.FogExp2(0x07111c,.018);
+const camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,500);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;document.body.prepend(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0x96b7df,0x16171a,1.2));
+const sun=new THREE.DirectionalLight(0xffe1ad,3.3);sun.position.set(-20,35,22);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const groundMat=new THREE.MeshStandardMaterial({color:0x4e5258,roughness:.96});
+const stoneMat=new THREE.MeshStandardMaterial({color:0x88867e,roughness:.88});
+const darkMat=new THREE.MeshStandardMaterial({color:0x141b23,roughness:.46,metalness:.35});
+const bronze=new THREE.MeshStandardMaterial({color:0x8c7045,roughness:.34,metalness:.62});
+const glow=new THREE.MeshStandardMaterial({color:0x77c7ff,emissive:0x229cff,emissiveIntensity:5,roughness:.2});
+function box(x,y,z,w,h,d,m){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;scene.add(o);return o}
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(140,140),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+
+// Welcome pavilion blockout
+box(0,.5,-6,28,1,18,stoneMat);
+box(-12,4,-6,1,8,18,darkMat);box(12,4,-6,1,8,18,darkMat);
+box(0,8,-6,26,.6,18,darkMat);
+for(let x=-9;x<=9;x+=3)box(x,4,2.75,.16,7,.3,bronze);
+box(-7,2,-4,5,4,7,stoneMat);box(7,2,-4,5,4,7,stoneMat);
+
+// route
+for(let z=7;z<=43;z+=4)box(0,.04,z,4,.08,2,stoneMat);
+for(let z=8;z<=42;z+=7){const l=box(-4,.65,z,.28,1.3,.28,darkMat);box(-4,1.45,z,.6,.4,.6,glow);box(4,.65,z,.28,1.3,.28,darkMat);box(4,1.45,z,.6,.4,.6,glow)}
+const goal=box(0,.12,47,14,.24,9,darkMat);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(5.1,.14,10,64),glow);ring.rotation.x=Math.PI/2;ring.position.set(0,.34,47);scene.add(ring);
+
+// collision AABBs
+const obstacles=[
+ new THREE.Box3(new THREE.Vector3(-12.7,0,-15),new THREE.Vector3(-11.3,9,3)),
+ new THREE.Box3(new THREE.Vector3(11.3,0,-15),new THREE.Vector3(12.7,9,3)),
+ new THREE.Box3(new THREE.Vector3(-10,0,-7.5),new THREE.Vector3(-4.5,4.5,-.5)),
+ new THREE.Box3(new THREE.Vector3(4.5,0,-7.5),new THREE.Vector3(10,4.5,-.5))
+];
+
+let player=null,mixer=null,actions={},currentAction=null,worldStarted=false,reached=false;
+const loader=new GLTFLoader();
+loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/gltf/Soldier.glb',g=>{
+  player=g.scene;
+  player.scale.setScalar(1.05);
+  player.position.set(0,0,0);
+  player.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});
+  scene.add(player);
+  mixer=new THREE.AnimationMixer(player);
+  for(const clip of g.animations) actions[clip.name]=mixer.clipAction(clip);
+  setAction(actions.Idle?'Idle':Object.keys(actions)[0]);
+  document.getElementById('status').textContent='角色資產已載入 · 等待 ENTER WORLD';
+},undefined,e=>{document.getElementById('status').textContent='角色載入失敗：'+e.message});
+
+function setAction(name){
+ if(!actions[name]||currentAction===actions[name])return;
+ const next=actions[name];
+ if(currentAction)currentAction.fadeOut(.18);
+ next.reset().fadeIn(.18).play();currentAction=next;
+}
+
+const keys={w:false,a:false,s:false,d:false,shift:false};
+addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(k==='w')keys.w=true;if(k==='a')keys.a=true;if(k==='s')keys.s=true;if(k==='d')keys.d=true;if(k==='shift')keys.shift=true});
+addEventListener('keyup',e=>{const k=e.key.toLowerCase();if(k==='w')keys.w=false;if(k==='a')keys.a=false;if(k==='s')keys.s=false;if(k==='d')keys.d=false;if(k==='shift')keys.shift=false});
+function bindHold(id,key){const el=document.getElementById(id);for(const ev of ['pointerdown'])el.addEventListener(ev,e=>{e.preventDefault();keys[key]=true});for(const ev of ['pointerup','pointercancel','pointerleave'])el.addEventListener(ev,e=>{e.preventDefault();keys[key]=false})}
+bindHold('up','w');bindHold('down','s');bindHold('left','a');bindHold('right','d');bindHold('run','shift');
+
+document.getElementById('enterBtn').onclick=()=>{worldStarted=true;document.getElementById('enter').style.display='none';document.getElementById('status').textContent='S010 SPAWN PASS · 請前往 Mobility Court'};
+
+let camYaw=0,drag=false,px=0;
+renderer.domElement.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){drag=true;px=e.clientX}});
+renderer.domElement.addEventListener('pointerup',()=>drag=false);
+renderer.domElement.addEventListener('pointermove',e=>{if(drag){camYaw-=(e.clientX-px)*.004;px=e.clientX}});
+
+const clock=new THREE.Clock();
+function collides(pos){
+ const p=new THREE.Box3(new THREE.Vector3(pos.x-.45,.05,pos.z-.45),new THREE.Vector3(pos.x+.45,1.8,pos.z+.45));
+ return obstacles.some(o=>o.intersectsBox(p));
+}
+function updatePlayer(dt){
+ if(!player||!worldStarted)return;
+ let f=(keys.w?1:0)-(keys.s?1:0),r=(keys.d?1:0)-(keys.a?1:0);
+ const moving=f!==0||r!==0,run=keys.shift&&moving;
+ if(moving){
+  const ang=Math.atan2(r,f)+camYaw;
+  const dir=new THREE.Vector3(Math.sin(ang),0,Math.cos(ang)).normalize();
+  const speed=run?6.2:3.1;
+  const np=player.position.clone().addScaledVector(dir,speed*dt);
+  if(!collides(np)){player.position.copy(np)}
+  const targetRot=ang;
+  let diff=((targetRot-player.rotation.y+Math.PI)%(Math.PI*2))-Math.PI;
+  player.rotation.y+=diff*Math.min(1,dt*10);
+  setAction(run&&actions.Run?'Run':actions.Walk?'Walk':actions.Run?'Run':Object.keys(actions)[0]);
+ }else setAction(actions.Idle?'Idle':Object.keys(actions)[0]);
+ if(!reached&&player.position.z>42&&Math.abs(player.position.x)<7){
+  reached=true;document.getElementById('status').textContent='S020 COMPLETE · 已抵達私人移動庭院 · 下一步：呼叫私人飛船';
+  ring.material=new THREE.MeshStandardMaterial({color:0x9cffb6,emissive:0x35ff78,emissiveIntensity:6});
+ }
+}
+function updateCamera(){
+ if(!player)return;
+ const t=player.position.clone().add(new THREE.Vector3(0,1.8,0));
+ const back=new THREE.Vector3(Math.sin(camYaw),.32,Math.cos(camYaw)).multiplyScalar(-7.2);
+ const desired=t.clone().add(back).add(new THREE.Vector3(0,2.0,0));
+ camera.position.lerp(desired,.10);camera.lookAt(t);
+}
+function loop(){
+ requestAnimationFrame(loop);
+ const dt=Math.min(clock.getDelta(),.05);
+ if(mixer)mixer.update(dt);
+ updatePlayer(dt);updateCamera();
+ renderer.render(scene,camera);
+}
+loop();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script>
+</body>
+</html>
